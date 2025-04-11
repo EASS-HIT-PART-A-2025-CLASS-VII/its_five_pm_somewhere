@@ -1,32 +1,44 @@
-from fastapi import FastAPI, Query
+# --- Imports ---
+
+from fastapi import FastAPI, Query, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from typing import Union, List
 from pydantic import BaseModel
+
+# Pydantic AI dependencies
 from pydantic_ai import Agent, RunContext, ModelRetry
 from pydantic_ai.models.groq import GroqModel
 from pydantic_ai.providers.groq import GroqProvider
-from fastapi.middleware.cors import CORSMiddleware
+
+# System and utilities
+import requests
 import nest_asyncio
 import os
-import requests
 
-# Needed for notebook environments; in real API deployments you can skip this.
+
+# --- Setup for async environments ---
 nest_asyncio.apply()
 
+
+# --- FastAPI App Initialization ---
 app = FastAPI()
 
-# Set up CORS for frontend
+# --- Middleware ---
+# Set up CORS to allow all origins (for development; restrict in production)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, specify exact origins
+    allow_origins=["*"],  
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# --- Models ---
+
+# --- Data Models ---
+
 class Ingredient(BaseModel):
     name: str
-    amount: str  # e.g., "50ml", "1 tsp", etc.
+    amount: str  # e.g., "50ml", "1 tsp"
 
 class DrinkRecipe(BaseModel):
     id: str
@@ -34,19 +46,19 @@ class DrinkRecipe(BaseModel):
     ingredients: List[Ingredient]
     instructions: List[str]
     alcoholContent: bool
-    type: str  # "Cocktail" | "Mocktail" | "Shot"
+    type: str  # e.g., "Cocktail", "Mocktail", "Shot"
     imageUrl: str
     isFavorite: bool
 
-# Invalid result model
 class InvalidDrinkRequest(BaseModel):
     error_message: str
 
-# Union for AI result
-DrinkResult = Union[DrinkRecipe, InvalidDrinkRequest]
+# Unified result type for validation
+DrinkAIResult = Union[DrinkRecipe, InvalidDrinkRequest]
 
-# Local in-memory array to store drink recipes
-drink_recipes = [
+
+# --- In-Memory Store ---
+drink_db: List[DrinkRecipe] = [
     DrinkRecipe(
         id="1",
         name="Mojito",
@@ -237,104 +249,135 @@ drink_recipes = [
     )
 ]
 
-# --- AI agent setup ---
-API_KEY = ""
+# --- AI Agent Setup ---
+
+GROQ_API_KEY = ""
 PEXELS_API_KEY = ""
 PEXELS_BASE_URL = "https://api.pexels.com/v1/search"
 
-headers = {
+pexels_headers = {
     "Authorization": PEXELS_API_KEY
 }
 
-model = GroqModel("llama-3.3-70b-versatile", provider=GroqProvider(api_key=API_KEY))
-agent: Agent[None, DrinkResult] = Agent(
-    model=model,
+llm_model = GroqModel("llama-3.3-70b-versatile", provider=GroqProvider(api_key=GROQ_API_KEY))
+
+mixology_agent: Agent[None, DrinkAIResult] = Agent(
+    model=llm_model,
     system_prompt=(
         "You are a professional mixologist assistant. "
         "Given a list of ingredient names, generate a creative and well-balanced drink recipe. "
-        "You must return a valid DrinkRecipe object (as described in the schema) with detailed instructions, "
-        "a creative name, and a fitting drink type. "
-        "The imageUrl should be in the format: https://unsplash.com/s/photos/drink-name "
-        "(replace spaces with hyphens and make it lowercase). "
-        "Make sure the ingredients and instructions align logically and are realistic."
+        "You may ignore ingredients that do not fit well together or are not relevant. "
+        "If the ingredients are insufficient to create a proper drink, return an InvalidDrinkRequest object "
+        "with a helpful error_message explaining why.\n\n"
+        "Return a valid DrinkRecipe object with:\n"
+        "- A creative and fitting name.\n"
+        "- Logical and realistic ingredients (amount + name).\n"
+        "- Clear, step-by-step instructions.\n"
+        "- alcoholContent set to true if any ingredient contains alcohol.\n"
+        "- A fitting type (e.g., 'Cocktail', 'Mocktail', 'Shot').\n"
+        "- imageUrl must be in this format: 'https://www.pexels.com/search/drink-name/'\n"
+        "  (replace spaces with hyphens and make it lowercase).\n"
+        "- Do not make up or invent ingredients; only use the provided list (or a subset if necessary)."
     ),
-    result_type=DrinkResult,
+    result_type=DrinkAIResult,
     deps_type=None,
 )
 
-@agent.result_validator
-async def validate_drink_result(ctx: RunContext[None], result: DrinkResult) -> DrinkResult:
+@mixology_agent.result_validator
+async def validate_ai_output(ctx: RunContext[None], result: DrinkAIResult) -> DrinkAIResult:
+    """Ensure the AI returns a valid drink recipe or a meaningful error."""
+
+    # If it's an error object, validate the message exists
     if isinstance(result, InvalidDrinkRequest):
+        if not result.error_message.strip():
+            return InvalidDrinkRequest(error_message="An unknown error occurred. Please try again.")
         return result
-    if not result.name or not result.ingredients or not result.instructions:
-        raise ModelRetry("Incomplete recipe. Try again.")
+
+    # Let the model decide if not enough ingredients — only check for schema issues here
+    if (
+        not result.name.strip() or
+        not result.ingredients or
+        any(not i.name.strip() or not i.amount.strip() for i in result.ingredients) or
+        not result.instructions or
+        any(not step.strip() for step in result.instructions) or
+        not isinstance(result.alcoholContent, bool) or
+        not result.type.strip() or
+        not result.imageUrl.startswith("https://") 
+        # not result.imageUrl.endswith((".jpg", ".jpeg", ".png", ".webp", ".gif"))
+    ):
+        # Fallback if model tried returning DrinkRecipe but it's broken
+        return InvalidDrinkRequest(error_message="The AI generated an incomplete or invalid recipe. Please try again.")
+
     return result
 
 
-# --- Endpoint ---
-# 1. Get all drink recipes
+# --- API Endpoints ---
+
 @app.get("/drinks", response_model=List[DrinkRecipe])
-def get_drinks():
-    return drink_recipes
+def list_all_drinks():
+    """Get all saved drink recipes."""
+    return drink_db
 
 
-@app.get("/drinks/images")
-def get_drink_images(
+@app.get("/drinks/images", response_model=List[str])
+def fetch_drink_images(
     name: str = Query(..., description="Search term for the image"),
     count: int = Query(6, description="Number of images per page"),
     page: int = Query(1, description="Page number for pagination")
-) -> List[str]:
+):
+    """Fetch drink-related images from Pexels API."""
     params = {
         "query": name,
         "per_page": count,
         "page": page
     }
     
-    response = requests.get(PEXELS_BASE_URL, headers=headers, params=params)
+    response = requests.get(PEXELS_BASE_URL, headers=pexels_headers, params=params)
     
     if response.status_code != 200:
         return {"error": f"Pexels API error: {response.status_code}"}
     
-    data = response.json()
-    urls = [photo["src"]["medium"] for photo in data.get("photos", [])]
-    return urls
-    
-# 2. Add a new drink recipe
+    photos = response.json().get("photos", [])
+    return [photo["src"]["medium"] for photo in photos]
+
+
 @app.post("/drinks", response_model=DrinkRecipe)
-def add_drink(drink: DrinkRecipe):
-    drink_recipes.append(drink)
+def add_new_drink(drink: DrinkRecipe):
+    """Add a custom drink recipe to the list."""
+    drink_db.append(drink)
     return drink
 
-# 3. Change favorite status of a drink
+
 @app.patch("/drinks/{drink_id}/favorite", response_model=DrinkRecipe)
-def change_favorite(drink_id: str):
-    # Find the drink recipe by ID
-    for drink in drink_recipes:
+def toggle_favorite_status(drink_id: str):
+    """Toggle favorite status of a specific drink."""
+    for drink in drink_db:
         if drink.id == drink_id:
-            drink.isFavorite = not drink.isFavorite  # Toggle the favorite status
+            drink.isFavorite = not drink.isFavorite
             return drink
     raise HTTPException(status_code=404, detail="Drink not found")
 
-# 4. Generate a drink recipe based on ingredients
+
 @app.post("/drinks/generate", response_model=DrinkRecipe)
-def generate_drink(ingredients: List[str]):
-    # Format the ingredient names into a prompt
+def generate_drink_from_ingredients(ingredients: List[str]):
+    """
+    Generate a creative drink recipe using AI based on given ingredients.
+    """
     ingredient_str = ", ".join(ingredients)
-    prompt = f"Create a drink using the following ingredients: {ingredient_str}."
+    user_prompt = f"Create a drink using the following ingredients: {ingredient_str}."
 
-    # Ask the AI for a drink recipe
-    result = agent.run_sync(prompt)
+    ai_result = mixology_agent.run_sync(user_prompt)
 
-    if isinstance(result.data, InvalidDrinkRequest):
-        raise Exception(f"AI generation failed: {result.data.error_message}")
+    if isinstance(ai_result.data, InvalidDrinkRequest):
+            raise HTTPException(
+                status_code=422,
+                detail=ai_result.data.error_message
+            )
 
-    new_recipe = result.data
+    new_drink = ai_result.data
+    new_drink.id = str(len(drink_db) + 1)  # Simple ID assignment
+    new_drink.isFavorite = False
 
-    # Assign a unique ID (basic incremental ID for simplicity)
-    new_recipe.id = str(len(drink_recipes) + 1)
-    new_recipe.isFavorite = False
+    drink_db.append(new_drink)
 
-    # Add to in-memory list
-    drink_recipes.append(new_recipe)
-
-    return new_recipe
+    return new_drink
