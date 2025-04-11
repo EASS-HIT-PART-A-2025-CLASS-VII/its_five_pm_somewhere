@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from typing import Union, List
 from pydantic import BaseModel
 from pydantic_ai import Agent, RunContext, ModelRetry
@@ -6,6 +6,8 @@ from pydantic_ai.models.groq import GroqModel
 from pydantic_ai.providers.groq import GroqProvider
 from fastapi.middleware.cors import CORSMiddleware
 import nest_asyncio
+import os
+import requests
 
 # Needed for notebook environments; in real API deployments you can skip this.
 nest_asyncio.apply()
@@ -237,6 +239,12 @@ drink_recipes = [
 
 # --- AI agent setup ---
 API_KEY = ""
+PEXELS_API_KEY = ""
+PEXELS_BASE_URL = "https://api.pexels.com/v1/search"
+
+headers = {
+    "Authorization": PEXELS_API_KEY
+}
 
 model = GroqModel("llama-3.3-70b-versatile", provider=GroqProvider(api_key=API_KEY))
 agent: Agent[None, DrinkResult] = Agent(
@@ -269,6 +277,28 @@ async def validate_drink_result(ctx: RunContext[None], result: DrinkResult) -> D
 def get_drinks():
     return drink_recipes
 
+
+@app.get("/drinks/images")
+def get_drink_images(
+    name: str = Query(..., description="Search term for the image"),
+    count: int = Query(6, description="Number of images per page"),
+    page: int = Query(1, description="Page number for pagination")
+) -> List[str]:
+    params = {
+        "query": name,
+        "per_page": count,
+        "page": page
+    }
+    
+    response = requests.get(PEXELS_BASE_URL, headers=headers, params=params)
+    
+    if response.status_code != 200:
+        return {"error": f"Pexels API error: {response.status_code}"}
+    
+    data = response.json()
+    urls = [photo["src"]["medium"] for photo in data.get("photos", [])]
+    return urls
+    
 # 2. Add a new drink recipe
 @app.post("/drinks", response_model=DrinkRecipe)
 def add_drink(drink: DrinkRecipe):
