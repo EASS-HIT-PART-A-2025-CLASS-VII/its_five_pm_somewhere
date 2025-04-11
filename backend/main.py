@@ -1,9 +1,14 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
+from typing import Union, List
 from pydantic import BaseModel
-from typing import List, Optional
+from pydantic_ai import Agent, RunContext, ModelRetry
+from pydantic_ai.models.groq import GroqModel
+from pydantic_ai.providers.groq import GroqProvider
 from fastapi.middleware.cors import CORSMiddleware
-import random
-# import json
+import nest_asyncio
+
+# Needed for notebook environments; in real API deployments you can skip this.
+nest_asyncio.apply()
 
 app = FastAPI()
 
@@ -16,9 +21,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
+# --- Models ---
 class Ingredient(BaseModel):
-    id: str
     name: str
     amount: str  # e.g., "50ml", "1 tsp", etc.
 
@@ -32,17 +36,24 @@ class DrinkRecipe(BaseModel):
     imageUrl: str
     isFavorite: bool
 
+# Invalid result model
+class InvalidDrinkRequest(BaseModel):
+    error_message: str
+
+# Union for AI result
+DrinkResult = Union[DrinkRecipe, InvalidDrinkRequest]
+
 # Local in-memory array to store drink recipes
 drink_recipes = [
     DrinkRecipe(
         id="1",
         name="Mojito",
         ingredients=[
-            Ingredient(id="1", name="White Rum", amount="50ml"),
-            Ingredient(id="2", name="Mint Leaves", amount="10 leaves"),
-            Ingredient(id="3", name="Lime", amount="1/2"),
-            Ingredient(id="4", name="Sugar", amount="2 tsp"),
-            Ingredient(id="5", name="Club Soda", amount="Top it up")
+            Ingredient(name="White Rum", amount="50ml"),
+            Ingredient(name="Mint Leaves", amount="10 leaves"),
+            Ingredient(name="Lime", amount="1/2"),
+            Ingredient(name="Sugar", amount="2 tsp"),
+            Ingredient(name="Club Soda", amount="Top it up")
         ],
         instructions=[
             "Muddle mint leaves and sugar in a glass.",
@@ -59,9 +70,9 @@ drink_recipes = [
         id="2",
         name="Martini",
         ingredients=[
-            Ingredient(id="1", name="Gin", amount="60ml"),
-            Ingredient(id="2", name="Dry Vermouth", amount="10ml"),
-            Ingredient(id="3", name="Olive", amount="1")
+            Ingredient(name="Gin", amount="60ml"),
+            Ingredient(name="Dry Vermouth", amount="10ml"),
+            Ingredient(name="Olive", amount="1")
         ],
         instructions=[
             "Pour gin and dry vermouth into a mixing glass.",
@@ -77,9 +88,9 @@ drink_recipes = [
         id="3",
         name="Gin and Tonic",
         ingredients=[
-            Ingredient(id="1", name="Gin", amount="50ml"),
-            Ingredient(id="2", name="Tonic Water", amount="Top it up"),
-            Ingredient(id="3", name="Lime", amount="1/4")
+            Ingredient(name="Gin", amount="50ml"),
+            Ingredient(name="Tonic Water", amount="Top it up"),
+            Ingredient(name="Lime", amount="1/4")
         ],
         instructions=[
             "Pour gin into a glass filled with ice.",
@@ -95,10 +106,10 @@ drink_recipes = [
         id="4",
         name="Old Fashioned",
         ingredients=[
-            Ingredient(id="1", name="Bourbon", amount="50ml"),
-            Ingredient(id="2", name="Sugar", amount="1 tsp"),
-            Ingredient(id="3", name="Angostura Bitters", amount="2 dashes"),
-            Ingredient(id="4", name="Orange Peel", amount="1 piece")
+            Ingredient(name="Bourbon", amount="50ml"),
+            Ingredient(name="Sugar", amount="1 tsp"),
+            Ingredient(name="Angostura Bitters", amount="2 dashes"),
+            Ingredient(name="Orange Peel", amount="1 piece")
         ],
         instructions=[
             "Muddle the sugar and bitters in a glass.",
@@ -114,10 +125,10 @@ drink_recipes = [
         id="5",
         name="Piña Colada",
         ingredients=[
-            Ingredient(id="1", name="White Rum", amount="50ml"),
-            Ingredient(id="2", name="Coconut Cream", amount="30ml"),
-            Ingredient(id="3", name="Pineapple Juice", amount="90ml"),
-            Ingredient(id="4", name="Pineapple Slice", amount="1 piece")
+            Ingredient(name="White Rum", amount="50ml"),
+            Ingredient(name="Coconut Cream", amount="30ml"),
+            Ingredient(name="Pineapple Juice", amount="90ml"),
+            Ingredient(name="Pineapple Slice", amount="1 piece")
         ],
         instructions=[
             "Blend all ingredients with ice.",
@@ -132,10 +143,10 @@ drink_recipes = [
         id="6",
         name="Margarita",
         ingredients=[
-            Ingredient(id="1", name="Tequila", amount="50ml"),
-            Ingredient(id="2", name="Lime Juice", amount="30ml"),
-            Ingredient(id="3", name="Triple Sec", amount="20ml"),
-            Ingredient(id="4", name="Salt", amount="For the rim")
+            Ingredient(name="Tequila", amount="50ml"),
+            Ingredient(name="Lime Juice", amount="30ml"),
+            Ingredient(name="Triple Sec", amount="20ml"),
+            Ingredient(name="Salt", amount="For the rim")
         ],
         instructions=[
             "Rub a lime wedge around the rim of a glass and dip it in salt.",
@@ -151,10 +162,10 @@ drink_recipes = [
         id="7",
         name="Cosmopolitan",
         ingredients=[
-            Ingredient(id="1", name="Vodka", amount="45ml"),
-            Ingredient(id="2", name="Triple Sec", amount="15ml"),
-            Ingredient(id="3", name="Lime Juice", amount="15ml"),
-            Ingredient(id="4", name="Cranberry Juice", amount="30ml")
+            Ingredient(name="Vodka", amount="45ml"),
+            Ingredient(name="Triple Sec", amount="15ml"),
+            Ingredient(name="Lime Juice", amount="15ml"),
+            Ingredient(name="Cranberry Juice", amount="30ml")
         ],
         instructions=[
             "Shake all ingredients with ice.",
@@ -169,11 +180,11 @@ drink_recipes = [
         id="8",
         name="Bloody Mary",
         ingredients=[
-            Ingredient(id="1", name="Vodka", amount="50ml"),
-            Ingredient(id="2", name="Tomato Juice", amount="100ml"),
-            Ingredient(id="3", name="Lemon Juice", amount="15ml"),
-            Ingredient(id="4", name="Tabasco Sauce", amount="Few dashes"),
-            Ingredient(id="5", name="Worcestershire Sauce", amount="Few dashes")
+            Ingredient(name="Vodka", amount="50ml"),
+            Ingredient(name="Tomato Juice", amount="100ml"),
+            Ingredient(name="Lemon Juice", amount="15ml"),
+            Ingredient(name="Tabasco Sauce", amount="Few dashes"),
+            Ingredient(name="Worcestershire Sauce", amount="Few dashes")
         ],
         instructions=[
             "Shake all ingredients with ice.",
@@ -188,11 +199,11 @@ drink_recipes = [
         id="9",
         name="Mai Tai",
         ingredients=[
-            Ingredient(id="1", name="Rum", amount="30ml"),
-            Ingredient(id="2", name="Orange Curaçao", amount="15ml"),
-            Ingredient(id="3", name="Orgeat Syrup", amount="15ml"),
-            Ingredient(id="4", name="Lime Juice", amount="30ml"),
-            Ingredient(id="5", name="Mint Leaves", amount="For garnish")
+            Ingredient(name="Rum", amount="30ml"),
+            Ingredient(name="Orange Curaçao", amount="15ml"),
+            Ingredient(name="Orgeat Syrup", amount="15ml"),
+            Ingredient(name="Lime Juice", amount="30ml"),
+            Ingredient(name="Mint Leaves", amount="For garnish")
         ],
         instructions=[
             "Shake all ingredients with ice.",
@@ -207,10 +218,10 @@ drink_recipes = [
         id="10",
         name="Whiskey Sour",
         ingredients=[
-            Ingredient(id="1", name="Whiskey", amount="50ml"),
-            Ingredient(id="2", name="Lemon Juice", amount="25ml"),
-            Ingredient(id="3", name="Simple Syrup", amount="15ml"),
-            Ingredient(id="4", name="Egg White", amount="1")
+            Ingredient(name="Whiskey", amount="50ml"),
+            Ingredient(name="Lemon Juice", amount="25ml"),
+            Ingredient(name="Simple Syrup", amount="15ml"),
+            Ingredient(name="Egg White", amount="1")
         ],
         instructions=[
             "Shake all ingredients without ice to emulsify.",
@@ -224,7 +235,35 @@ drink_recipes = [
     )
 ]
 
+# --- AI agent setup ---
+API_KEY = ""
 
+model = GroqModel("llama-3.3-70b-versatile", provider=GroqProvider(api_key=API_KEY))
+agent: Agent[None, DrinkResult] = Agent(
+    model=model,
+    system_prompt=(
+        "You are a professional mixologist assistant. "
+        "Given a list of ingredient names, generate a creative and well-balanced drink recipe. "
+        "You must return a valid DrinkRecipe object (as described in the schema) with detailed instructions, "
+        "a creative name, and a fitting drink type. "
+        "The imageUrl should be in the format: https://unsplash.com/s/photos/drink-name "
+        "(replace spaces with hyphens and make it lowercase). "
+        "Make sure the ingredients and instructions align logically and are realistic."
+    ),
+    result_type=DrinkResult,
+    deps_type=None,
+)
+
+@agent.result_validator
+async def validate_drink_result(ctx: RunContext[None], result: DrinkResult) -> DrinkResult:
+    if isinstance(result, InvalidDrinkRequest):
+        return result
+    if not result.name or not result.ingredients or not result.instructions:
+        raise ModelRetry("Incomplete recipe. Try again.")
+    return result
+
+
+# --- Endpoint ---
 # 1. Get all drink recipes
 @app.get("/drinks", response_model=List[DrinkRecipe])
 def get_drinks():
@@ -249,24 +288,23 @@ def change_favorite(drink_id: str):
 # 4. Generate a drink recipe based on ingredients
 @app.post("/drinks/generate", response_model=DrinkRecipe)
 def generate_drink(ingredients: List[str]):
-    # A simple mock generation logic (you can replace this with a more complex one)
-    if not ingredients:
-        raise HTTPException(status_code=400, detail="Ingredients list is required")
-    
-    # Randomly generate a drink name
-    drink_name = f"Generated Drink {random.randint(1, 100)}"
-    
-    # Generate the recipe details based on ingredients (just a mock-up)
-    generated_recipe = DrinkRecipe(
-        id=str(random.randint(1, 1000)),
-        name=drink_name,
-        ingredients=[Ingredient(id=str(i), name=ingredient, amount="50ml") for i, ingredient in enumerate(ingredients)],
-        instructions=["Mix the ingredients in a shaker and serve."],
-        alcoholContent=random.choice([True, False]),
-        type=random.choice(["Cocktail", "Mocktail", "Shot"]),
-        imageUrl="https://example.com/drink.jpg",
-        isFavorite=False
-    )
-    
-    # Return the generated drink recipe
-    return generated_recipe
+    # Format the ingredient names into a prompt
+    ingredient_str = ", ".join(ingredients)
+    prompt = f"Create a drink using the following ingredients: {ingredient_str}."
+
+    # Ask the AI for a drink recipe
+    result = agent.run_sync(prompt)
+
+    if isinstance(result.data, InvalidDrinkRequest):
+        raise Exception(f"AI generation failed: {result.data.error_message}")
+
+    new_recipe = result.data
+
+    # Assign a unique ID (basic incremental ID for simplicity)
+    new_recipe.id = str(len(drink_recipes) + 1)
+    new_recipe.isFavorite = False
+
+    # Add to in-memory list
+    drink_recipes.append(new_recipe)
+
+    return new_recipe
