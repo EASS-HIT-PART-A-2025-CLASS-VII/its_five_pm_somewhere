@@ -1,1 +1,3 @@
 will be a dockerfile in the future
+
+uvicorn app.main:app --reload
