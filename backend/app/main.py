@@ -77,7 +77,7 @@ drink_db: List[DrinkRecipe] = [
         ],
         alcoholContent=True,
         type="Cocktail",
-        imageUrl="https://unsplash.com/s/photos/mojito",
+        imageUrl="https://images.pexels.com/photos/1187766/pexels-photo-1187766.jpeg?auto=compress&cs=tinysrgb&h=350",
         isFavorite=False
     ),
     DrinkRecipe(
@@ -95,7 +95,7 @@ drink_db: List[DrinkRecipe] = [
         ],
         alcoholContent=True,
         type="Cocktail",
-        imageUrl="https://unsplash.com/s/photos/martini",
+        imageUrl="https://images.pexels.com/photos/2531186/pexels-photo-2531186.jpeg?auto=compress&cs=tinysrgb&h=350",
         isFavorite=False
     ),
     DrinkRecipe(
@@ -113,7 +113,7 @@ drink_db: List[DrinkRecipe] = [
         ],
         alcoholContent=True,
         type="Cocktail",
-        imageUrl="https://unsplash.com/s/photos/gin-and-tonic",
+        imageUrl="https://images.pexels.com/photos/616836/pexels-photo-616836.jpeg?auto=compress&cs=tinysrgb&h=350",
         isFavorite=False
     ),
     DrinkRecipe(
@@ -132,7 +132,7 @@ drink_db: List[DrinkRecipe] = [
         ],
         alcoholContent=True,
         type="Cocktail",
-        imageUrl="https://unsplash.com/s/photos/old-fashioned",
+        imageUrl="https://images.pexels.com/photos/31589567/pexels-photo-31589567.jpeg?auto=compress&cs=tinysrgb&h=350",
         isFavorite=False
     ),
     DrinkRecipe(
@@ -150,7 +150,7 @@ drink_db: List[DrinkRecipe] = [
         ],
         alcoholContent=True,
         type="Cocktail",
-        imageUrl="https://unsplash.com/s/photos/pina-colada",
+        imageUrl="https://images.pexels.com/photos/8944950/pexels-photo-8944950.jpeg?auto=compress&cs=tinysrgb&h=350",
         isFavorite=False
     ),
     DrinkRecipe(
@@ -169,7 +169,7 @@ drink_db: List[DrinkRecipe] = [
         ],
         alcoholContent=True,
         type="Cocktail",
-        imageUrl="https://unsplash.com/s/photos/margarita",
+        imageUrl="https://images.pexels.com/photos/1590154/pexels-photo-1590154.jpeg?auto=compress&cs=tinysrgb&h=350",
         isFavorite=False
     ),
     DrinkRecipe(
@@ -187,7 +187,7 @@ drink_db: List[DrinkRecipe] = [
         ],
         alcoholContent=True,
         type="Cocktail",
-        imageUrl="https://unsplash.com/s/photos/cosmopolitan",
+        imageUrl="https://images.pexels.com/photos/31623993/pexels-photo-31623993.jpeg?auto=compress&cs=tinysrgb&h=350",
         isFavorite=False
     ),
     DrinkRecipe(
@@ -206,7 +206,7 @@ drink_db: List[DrinkRecipe] = [
         ],
         alcoholContent=True,
         type="Cocktail",
-        imageUrl="https://unsplash.com/s/photos/bloody-mary",
+        imageUrl="https://images.pexels.com/photos/7376796/pexels-photo-7376796.jpeg?auto=compress&cs=tinysrgb&h=350",
         isFavorite=False
     ),
     DrinkRecipe(
@@ -225,7 +225,7 @@ drink_db: List[DrinkRecipe] = [
         ],
         alcoholContent=True,
         type="Cocktail",
-        imageUrl="https://unsplash.com/s/photos/mai-tai",
+        imageUrl="https://images.pexels.com/photos/11481550/pexels-photo-11481550.jpeg?auto=compress&cs=tinysrgb&h=350",
         isFavorite=False
     ),
     DrinkRecipe(
@@ -244,7 +244,7 @@ drink_db: List[DrinkRecipe] = [
         ],
         alcoholContent=True,
         type="Cocktail",
-        imageUrl="https://unsplash.com/s/photos/whiskey-sour",
+        imageUrl="https://images.pexels.com/photos/28834354/pexels-photo-28834354.jpeg?auto=compress&cs=tinysrgb&h=350",
         isFavorite=False
     )
 ]
