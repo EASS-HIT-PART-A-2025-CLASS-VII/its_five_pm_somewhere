@@ -1,4 +1,4 @@
-import { createContext, useState, ReactNode , useContext } from 'react';
+import { createContext, useState, ReactNode , useContext, useEffect } from 'react';
 import { getAllDrinks, addNewDrink, toggleFavorite, generateDrinkFromIngredients, getRandomDrink } from '../services/drinkService';
 import { fetchDrinkImages } from '../services/imageService';
 import { DrinkRecipe } from '../types/drink';
@@ -16,6 +16,7 @@ interface DrinkContextType {
   generateDrink: (ingredients: string[]) => void;
   fetchRandomDrink: () => void;
   fetchImages: (name: string) => void;
+  clearError: () => void;
 }
 
 // Create the context
@@ -33,6 +34,10 @@ export const DrinkProvider: React.FC<DrinkProviderProps> = ({ children }) => {
   const [images, setImages] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchDrinks();
+  }, []);
 
   // Fetch all drinks
   const fetchDrinks = async () => {
@@ -120,6 +125,8 @@ export const DrinkProvider: React.FC<DrinkProviderProps> = ({ children }) => {
     }
   };
 
+  const clearError = () => setError(null);
+
   return (
     <DrinkContext.Provider
       value={{
@@ -134,6 +141,7 @@ export const DrinkProvider: React.FC<DrinkProviderProps> = ({ children }) => {
         generateDrink,
         fetchRandomDrink,
         fetchImages,
+        clearError
       }}
     >
       {children}
