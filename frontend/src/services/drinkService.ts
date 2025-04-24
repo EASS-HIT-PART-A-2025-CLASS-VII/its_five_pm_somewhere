@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { DrinkRecipe } from '../types/drink';
 
-const API_URL = 'http://localhost:8000'; // Adjust this URL to your FastAPI server
+const API_URL = import.meta.env.VITE_REACT_APP_BACKEND_URL
 
 // List all drinks
 export const getAllDrinks = async (): Promise<DrinkRecipe[]> => {

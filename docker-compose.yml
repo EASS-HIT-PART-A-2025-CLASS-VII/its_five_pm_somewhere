@@ -1,34 +1,31 @@
-version: '3.8'
-
 services:
   backend:
-    build: ./backend
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
     ports:
-      - "8001:8000"
+      - "8000:8000"
     networks:
       - app-network
-    # depends_on:
-    #   - ai-service
     env_file:
       - ./backend/.env
-
-  # ai-service:
-  #   build: ./ai-service
-  #   ports:
-  #     - "8002:8000"
-  #   networks:
-  #     - app-network
 
   frontend:
     build: ./frontend
     ports:
-      - "3000:3000"
+      - "5173:5173"
+      # - "4173:4173" #for builds
     environment:
-      - REACT_APP_BACKEND_URL=http://backend:8000
+      - VITE_REACT_APP_BACKEND_URL=http://localhost:8000
     networks:
       - app-network
     depends_on:
       - backend
+    
 
 networks:
   app-network:
+
+
+# docker-compose up --build -d
+# docker-compose down

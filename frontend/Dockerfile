@@ -10,6 +10,7 @@ COPY . .
 
 RUN npm run build
 
-EXPOSE 3000
+EXPOSE 5173
 
-CMD ["npm", "start"]
+CMD ["npm", "run", "dev", "--", "--host"]
+# CMD ["npm", "run", "preview", "--", "--host"] #for builds

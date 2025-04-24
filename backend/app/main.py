@@ -1,20 +1,24 @@
-# --- Imports ---
+# --- System and utilities ---
+import os
+import sys
+import requests
+import nest_asyncio
+from dotenv import load_dotenv
 
+# Add shared folder to path before importing anything from it
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'shared')))
+
+# --- Imports ---
 from fastapi import FastAPI, Query, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from typing import Union, List
-from pydantic import BaseModel
+from typing import List
+from shared.models import Ingredient, DrinkRecipe, InvalidDrinkRequest, DrinkAIResult
 
 # Pydantic AI dependencies
 from pydantic_ai import Agent, RunContext, ModelRetry
 from pydantic_ai.models.groq import GroqModel
 from pydantic_ai.providers.groq import GroqProvider
 
-# System and utilities
-import requests
-import nest_asyncio
-import os
-from dotenv import load_dotenv
 
 
 # --- Load Environment variables ---
@@ -39,29 +43,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-# --- Data Models ---
-
-class Ingredient(BaseModel):
-    name: str
-    amount: str  # e.g., "50ml", "1 tsp"
-
-class DrinkRecipe(BaseModel):
-    id: str
-    name: str
-    ingredients: List[Ingredient]
-    instructions: List[str]
-    alcoholContent: bool
-    type: str  # e.g., "Cocktail", "Mocktail", "Shot"
-    imageUrl: str
-    isFavorite: bool
-
-class InvalidDrinkRequest(BaseModel):
-    error_message: str
-
-# Unified result type for validation
-DrinkAIResult = Union[DrinkRecipe, InvalidDrinkRequest]
 
 
 # --- In-Memory Store ---
