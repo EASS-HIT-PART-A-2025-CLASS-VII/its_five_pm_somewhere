@@ -14,6 +14,13 @@ from pydantic_ai.providers.groq import GroqProvider
 import requests
 import nest_asyncio
 import os
+from dotenv import load_dotenv
+
+
+# --- Load Environment variables ---
+load_dotenv()
+PEXELS_API_KEY = os.getenv("PEXELS_API_KEY")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 
 # --- Setup for async environments ---
@@ -250,9 +257,6 @@ drink_db: List[DrinkRecipe] = [
 ]
 
 # --- AI Agent Setup ---
-
-GROQ_API_KEY = ""
-PEXELS_API_KEY = ""
 PEXELS_BASE_URL = "https://api.pexels.com/v1/search"
 
 pexels_headers = {

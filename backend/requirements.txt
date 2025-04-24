@@ -3,3 +3,5 @@ uvicorn
 pydantic
 pydantic-ai-slim[groq]
 requests
+python-dotenv
+nest_asyncio
