@@ -4,6 +4,8 @@ import sys
 import requests
 import nest_asyncio
 from dotenv import load_dotenv
+import uuid
+import random
 
 # Add shared folder to path before importing anything from it
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'shared')))
@@ -11,8 +13,9 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.
 # --- Imports ---
 from fastapi import FastAPI, Query, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from typing import List
 from shared.models import Ingredient, DrinkRecipe, InvalidDrinkRequest, DrinkAIResult
+from .drink_data import drink_db
+from typing import List
 
 # Pydantic AI dependencies
 from pydantic_ai import Agent, RunContext, ModelRetry
@@ -43,199 +46,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-# --- In-Memory Store ---
-drink_db: List[DrinkRecipe] = [
-    DrinkRecipe(
-        id="1",
-        name="Mojito",
-        ingredients=[
-            Ingredient(name="White Rum", amount="50ml"),
-            Ingredient(name="Mint Leaves", amount="10 leaves"),
-            Ingredient(name="Lime", amount="1/2"),
-            Ingredient(name="Sugar", amount="2 tsp"),
-            Ingredient(name="Club Soda", amount="Top it up")
-        ],
-        instructions=[
-            "Muddle mint leaves and sugar in a glass.",
-            "Add lime juice and rum.",
-            "Fill the glass with ice and top it up with club soda.",
-            "Stir gently and garnish with a mint sprig."
-        ],
-        alcoholContent=True,
-        type="Cocktail",
-        imageUrl="https://images.pexels.com/photos/1187766/pexels-photo-1187766.jpeg?auto=compress&cs=tinysrgb&h=350",
-        isFavorite=False
-    ),
-    DrinkRecipe(
-        id="2",
-        name="Martini",
-        ingredients=[
-            Ingredient(name="Gin", amount="60ml"),
-            Ingredient(name="Dry Vermouth", amount="10ml"),
-            Ingredient(name="Olive", amount="1")
-        ],
-        instructions=[
-            "Pour gin and dry vermouth into a mixing glass.",
-            "Fill with ice and stir for 20-30 seconds.",
-            "Strain into a chilled martini glass and garnish with an olive."
-        ],
-        alcoholContent=True,
-        type="Cocktail",
-        imageUrl="https://images.pexels.com/photos/2531186/pexels-photo-2531186.jpeg?auto=compress&cs=tinysrgb&h=350",
-        isFavorite=False
-    ),
-    DrinkRecipe(
-        id="3",
-        name="Gin and Tonic",
-        ingredients=[
-            Ingredient(name="Gin", amount="50ml"),
-            Ingredient(name="Tonic Water", amount="Top it up"),
-            Ingredient(name="Lime", amount="1/4")
-        ],
-        instructions=[
-            "Pour gin into a glass filled with ice.",
-            "Top it up with tonic water.",
-            "Garnish with a lime wedge."
-        ],
-        alcoholContent=True,
-        type="Cocktail",
-        imageUrl="https://images.pexels.com/photos/616836/pexels-photo-616836.jpeg?auto=compress&cs=tinysrgb&h=350",
-        isFavorite=False
-    ),
-    DrinkRecipe(
-        id="4",
-        name="Old Fashioned",
-        ingredients=[
-            Ingredient(name="Bourbon", amount="50ml"),
-            Ingredient(name="Sugar", amount="1 tsp"),
-            Ingredient(name="Angostura Bitters", amount="2 dashes"),
-            Ingredient(name="Orange Peel", amount="1 piece")
-        ],
-        instructions=[
-            "Muddle the sugar and bitters in a glass.",
-            "Add bourbon and stir with ice.",
-            "Garnish with an orange peel."
-        ],
-        alcoholContent=True,
-        type="Cocktail",
-        imageUrl="https://images.pexels.com/photos/31589567/pexels-photo-31589567.jpeg?auto=compress&cs=tinysrgb&h=350",
-        isFavorite=False
-    ),
-    DrinkRecipe(
-        id="5",
-        name="Piña Colada",
-        ingredients=[
-            Ingredient(name="White Rum", amount="50ml"),
-            Ingredient(name="Coconut Cream", amount="30ml"),
-            Ingredient(name="Pineapple Juice", amount="90ml"),
-            Ingredient(name="Pineapple Slice", amount="1 piece")
-        ],
-        instructions=[
-            "Blend all ingredients with ice.",
-            "Pour into a glass and garnish with a pineapple slice."
-        ],
-        alcoholContent=True,
-        type="Cocktail",
-        imageUrl="https://images.pexels.com/photos/8944950/pexels-photo-8944950.jpeg?auto=compress&cs=tinysrgb&h=350",
-        isFavorite=False
-    ),
-    DrinkRecipe(
-        id="6",
-        name="Margarita",
-        ingredients=[
-            Ingredient(name="Tequila", amount="50ml"),
-            Ingredient(name="Lime Juice", amount="30ml"),
-            Ingredient(name="Triple Sec", amount="20ml"),
-            Ingredient(name="Salt", amount="For the rim")
-        ],
-        instructions=[
-            "Rub a lime wedge around the rim of a glass and dip it in salt.",
-            "Shake tequila, lime juice, and triple sec with ice.",
-            "Strain into the prepared glass."
-        ],
-        alcoholContent=True,
-        type="Cocktail",
-        imageUrl="https://images.pexels.com/photos/1590154/pexels-photo-1590154.jpeg?auto=compress&cs=tinysrgb&h=350",
-        isFavorite=False
-    ),
-    DrinkRecipe(
-        id="7",
-        name="Cosmopolitan",
-        ingredients=[
-            Ingredient(name="Vodka", amount="45ml"),
-            Ingredient(name="Triple Sec", amount="15ml"),
-            Ingredient(name="Lime Juice", amount="15ml"),
-            Ingredient(name="Cranberry Juice", amount="30ml")
-        ],
-        instructions=[
-            "Shake all ingredients with ice.",
-            "Strain into a chilled martini glass."
-        ],
-        alcoholContent=True,
-        type="Cocktail",
-        imageUrl="https://images.pexels.com/photos/31623993/pexels-photo-31623993.jpeg?auto=compress&cs=tinysrgb&h=350",
-        isFavorite=False
-    ),
-    DrinkRecipe(
-        id="8",
-        name="Bloody Mary",
-        ingredients=[
-            Ingredient(name="Vodka", amount="50ml"),
-            Ingredient(name="Tomato Juice", amount="100ml"),
-            Ingredient(name="Lemon Juice", amount="15ml"),
-            Ingredient(name="Tabasco Sauce", amount="Few dashes"),
-            Ingredient(name="Worcestershire Sauce", amount="Few dashes")
-        ],
-        instructions=[
-            "Shake all ingredients with ice.",
-            "Strain into a tall glass and garnish with a celery stick."
-        ],
-        alcoholContent=True,
-        type="Cocktail",
-        imageUrl="https://images.pexels.com/photos/7376796/pexels-photo-7376796.jpeg?auto=compress&cs=tinysrgb&h=350",
-        isFavorite=False
-    ),
-    DrinkRecipe(
-        id="9",
-        name="Mai Tai",
-        ingredients=[
-            Ingredient(name="Rum", amount="30ml"),
-            Ingredient(name="Orange Curaçao", amount="15ml"),
-            Ingredient(name="Orgeat Syrup", amount="15ml"),
-            Ingredient(name="Lime Juice", amount="30ml"),
-            Ingredient(name="Mint Leaves", amount="For garnish")
-        ],
-        instructions=[
-            "Shake all ingredients with ice.",
-            "Strain into a glass filled with crushed ice and garnish with mint leaves."
-        ],
-        alcoholContent=True,
-        type="Cocktail",
-        imageUrl="https://images.pexels.com/photos/11481550/pexels-photo-11481550.jpeg?auto=compress&cs=tinysrgb&h=350",
-        isFavorite=False
-    ),
-    DrinkRecipe(
-        id="10",
-        name="Whiskey Sour",
-        ingredients=[
-            Ingredient(name="Whiskey", amount="50ml"),
-            Ingredient(name="Lemon Juice", amount="25ml"),
-            Ingredient(name="Simple Syrup", amount="15ml"),
-            Ingredient(name="Egg White", amount="1")
-        ],
-        instructions=[
-            "Shake all ingredients without ice to emulsify.",
-            "Add ice and shake again.",
-            "Strain into a glass and garnish with a cherry."
-        ],
-        alcoholContent=True,
-        type="Cocktail",
-        imageUrl="https://images.pexels.com/photos/28834354/pexels-photo-28834354.jpeg?auto=compress&cs=tinysrgb&h=350",
-        isFavorite=False
-    )
-]
 
 # --- AI Agent Setup ---
 PEXELS_BASE_URL = "https://api.pexels.com/v1/search"
@@ -329,6 +139,7 @@ def fetch_drink_images(
 @app.post("/drinks", response_model=DrinkRecipe)
 def add_new_drink(drink: DrinkRecipe):
     """Add a custom drink recipe to the list."""
+    drink.id = str(uuid.uuid4())
     drink_db.append(drink)
     return drink
 
@@ -341,6 +152,12 @@ def toggle_favorite_status(drink_id: str):
             drink.isFavorite = not drink.isFavorite
             return drink
     raise HTTPException(status_code=404, detail="Drink not found")
+
+
+@app.get("/drinks/random", response_model=DrinkRecipe)
+def get_random_drink():
+    """Return a random drink from the database."""
+    return random.choice(drink_db)
 
 
 @app.post("/drinks/generate", response_model=DrinkRecipe)
@@ -360,7 +177,7 @@ def generate_drink_from_ingredients(ingredients: List[str]):
             )
 
     new_drink = ai_result.data
-    new_drink.id = str(len(drink_db) + 1)  # Simple ID assignment
+    new_drink.id = str(uuid.uuid4())
     new_drink.isFavorite = False
 
     drink_db.append(new_drink)
