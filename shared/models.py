@@ -15,8 +15,14 @@ class DrinkRecipe(BaseModel):
     imageUrl: str
     isFavorite: bool
 
-class InvalidDrinkRequest(BaseModel):
-    error_message: str
+class ErrorResponse(BaseModel):
+    error_code: int
+    message: str
+
+class ImageSearchRequest(BaseModel):
+    name: str
+    count: int # Number of images per page
+    page: int # Page number for pagination
 
 # Unified result type for validation
-DrinkAIResult = Union[DrinkRecipe, InvalidDrinkRequest]
+DrinkAIResult = Union[DrinkRecipe, ErrorResponse]
