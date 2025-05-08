@@ -4,3 +4,5 @@ pydantic
 pydantic-ai-slim[groq]
 requests
 python-dotenv
+pytest
+httpx
