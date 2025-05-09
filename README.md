@@ -22,3 +22,13 @@ Browse the suggested recipes, with options to filter by type (Cocktail, Mocktail
 Follow the step-by-step mixing instructions to create your perfect drink.
 
 Save your favorite recipes for future use or create your own custom drink recipes.
+
+# docker-compose up --build -d
+# docker-compose down
+# docker-compose logs
+# docker ps
+
+
+- how to run tests using docker
+docker-compose up --build test --abort-on-container-exit --exit-code-from test
+docker-compose down

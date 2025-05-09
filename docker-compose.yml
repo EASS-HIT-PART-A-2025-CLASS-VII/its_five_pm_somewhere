@@ -21,13 +21,20 @@ services:
       - app-network
     depends_on:
       - backend
-    
+
+  test:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    depends_on:
+      - backend
+    networks:
+      - app-network
+    command: [ "pytest", "tests/integration_test.py", "-v" ]
+    env_file:
+      - ./backend/.env
+    environment:
+      - PYTHONPATH=/app # Adjust this path as per the container's filesystem
 
 networks:
   app-network:
-
-
-# docker-compose up --build -d
-# docker-compose down
-# docker-compose logs
-# docker ps
