@@ -8,9 +8,9 @@ WORKDIR /app
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy entire app including shared/
+# Copy entire app
 COPY backend/app ./app
-COPY shared ./shared
+COPY backend/tests ./tests
 
 EXPOSE 8000
 
