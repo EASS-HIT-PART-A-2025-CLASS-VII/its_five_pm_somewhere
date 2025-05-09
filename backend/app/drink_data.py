@@ -1,5 +1,5 @@
 from typing import List
-from shared.models import Ingredient, DrinkRecipe
+from app.models import Ingredient, DrinkRecipe
 
 # --- In-Memory Store ---
 drink_db: List[DrinkRecipe] = [
