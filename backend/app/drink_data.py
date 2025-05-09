@@ -11,18 +11,18 @@ drink_db: List[DrinkRecipe] = [
             Ingredient(name="Mint Leaves", amount="10 leaves"),
             Ingredient(name="Lime", amount="1/2"),
             Ingredient(name="Sugar", amount="2 tsp"),
-            Ingredient(name="Club Soda", amount="Top it up")
+            Ingredient(name="Club Soda", amount="Top it up"),
         ],
         instructions=[
             "Muddle mint leaves and sugar in a glass.",
             "Add lime juice and rum.",
             "Fill the glass with ice and top it up with club soda.",
-            "Stir gently and garnish with a mint sprig."
+            "Stir gently and garnish with a mint sprig.",
         ],
         alcoholContent=True,
         type="Cocktail",
         imageUrl="https://images.pexels.com/photos/1187766/pexels-photo-1187766.jpeg?auto=compress&cs=tinysrgb&h=350",
-        isFavorite=False
+        isFavorite=False,
     ),
     DrinkRecipe(
         id="2",
@@ -30,17 +30,17 @@ drink_db: List[DrinkRecipe] = [
         ingredients=[
             Ingredient(name="Gin", amount="60ml"),
             Ingredient(name="Dry Vermouth", amount="10ml"),
-            Ingredient(name="Olive", amount="1")
+            Ingredient(name="Olive", amount="1"),
         ],
         instructions=[
             "Pour gin and dry vermouth into a mixing glass.",
             "Fill with ice and stir for 20-30 seconds.",
-            "Strain into a chilled martini glass and garnish with an olive."
+            "Strain into a chilled martini glass and garnish with an olive.",
         ],
         alcoholContent=True,
         type="Cocktail",
         imageUrl="https://images.pexels.com/photos/2531186/pexels-photo-2531186.jpeg?auto=compress&cs=tinysrgb&h=350",
-        isFavorite=False
+        isFavorite=False,
     ),
     DrinkRecipe(
         id="3",
@@ -48,17 +48,17 @@ drink_db: List[DrinkRecipe] = [
         ingredients=[
             Ingredient(name="Gin", amount="50ml"),
             Ingredient(name="Tonic Water", amount="Top it up"),
-            Ingredient(name="Lime", amount="1/4")
+            Ingredient(name="Lime", amount="1/4"),
         ],
         instructions=[
             "Pour gin into a glass filled with ice.",
             "Top it up with tonic water.",
-            "Garnish with a lime wedge."
+            "Garnish with a lime wedge.",
         ],
         alcoholContent=True,
         type="Cocktail",
         imageUrl="https://images.pexels.com/photos/616836/pexels-photo-616836.jpeg?auto=compress&cs=tinysrgb&h=350",
-        isFavorite=False
+        isFavorite=False,
     ),
     DrinkRecipe(
         id="4",
@@ -67,17 +67,17 @@ drink_db: List[DrinkRecipe] = [
             Ingredient(name="Bourbon", amount="50ml"),
             Ingredient(name="Sugar", amount="1 tsp"),
             Ingredient(name="Angostura Bitters", amount="2 dashes"),
-            Ingredient(name="Orange Peel", amount="1 piece")
+            Ingredient(name="Orange Peel", amount="1 piece"),
         ],
         instructions=[
             "Muddle the sugar and bitters in a glass.",
             "Add bourbon and stir with ice.",
-            "Garnish with an orange peel."
+            "Garnish with an orange peel.",
         ],
         alcoholContent=True,
         type="Cocktail",
         imageUrl="https://images.pexels.com/photos/31589567/pexels-photo-31589567.jpeg?auto=compress&cs=tinysrgb&h=350",
-        isFavorite=False
+        isFavorite=False,
     ),
     DrinkRecipe(
         id="5",
@@ -86,16 +86,16 @@ drink_db: List[DrinkRecipe] = [
             Ingredient(name="White Rum", amount="50ml"),
             Ingredient(name="Coconut Cream", amount="30ml"),
             Ingredient(name="Pineapple Juice", amount="90ml"),
-            Ingredient(name="Pineapple Slice", amount="1 piece")
+            Ingredient(name="Pineapple Slice", amount="1 piece"),
         ],
         instructions=[
             "Blend all ingredients with ice.",
-            "Pour into a glass and garnish with a pineapple slice."
+            "Pour into a glass and garnish with a pineapple slice.",
         ],
         alcoholContent=True,
         type="Cocktail",
         imageUrl="https://images.pexels.com/photos/8944950/pexels-photo-8944950.jpeg?auto=compress&cs=tinysrgb&h=350",
-        isFavorite=False
+        isFavorite=False,
     ),
     DrinkRecipe(
         id="6",
@@ -104,17 +104,17 @@ drink_db: List[DrinkRecipe] = [
             Ingredient(name="Tequila", amount="50ml"),
             Ingredient(name="Lime Juice", amount="30ml"),
             Ingredient(name="Triple Sec", amount="20ml"),
-            Ingredient(name="Salt", amount="For the rim")
+            Ingredient(name="Salt", amount="For the rim"),
         ],
         instructions=[
             "Rub a lime wedge around the rim of a glass and dip it in salt.",
             "Shake tequila, lime juice, and triple sec with ice.",
-            "Strain into the prepared glass."
+            "Strain into the prepared glass.",
         ],
         alcoholContent=True,
         type="Cocktail",
         imageUrl="https://images.pexels.com/photos/1590154/pexels-photo-1590154.jpeg?auto=compress&cs=tinysrgb&h=350",
-        isFavorite=False
+        isFavorite=False,
     ),
     DrinkRecipe(
         id="7",
@@ -123,16 +123,16 @@ drink_db: List[DrinkRecipe] = [
             Ingredient(name="Vodka", amount="45ml"),
             Ingredient(name="Triple Sec", amount="15ml"),
             Ingredient(name="Lime Juice", amount="15ml"),
-            Ingredient(name="Cranberry Juice", amount="30ml")
+            Ingredient(name="Cranberry Juice", amount="30ml"),
         ],
         instructions=[
             "Shake all ingredients with ice.",
-            "Strain into a chilled martini glass."
+            "Strain into a chilled martini glass.",
         ],
         alcoholContent=True,
         type="Cocktail",
         imageUrl="https://images.pexels.com/photos/31623993/pexels-photo-31623993.jpeg?auto=compress&cs=tinysrgb&h=350",
-        isFavorite=False
+        isFavorite=False,
     ),
     DrinkRecipe(
         id="8",
@@ -142,16 +142,16 @@ drink_db: List[DrinkRecipe] = [
             Ingredient(name="Tomato Juice", amount="100ml"),
             Ingredient(name="Lemon Juice", amount="15ml"),
             Ingredient(name="Tabasco Sauce", amount="Few dashes"),
-            Ingredient(name="Worcestershire Sauce", amount="Few dashes")
+            Ingredient(name="Worcestershire Sauce", amount="Few dashes"),
         ],
         instructions=[
             "Shake all ingredients with ice.",
-            "Strain into a tall glass and garnish with a celery stick."
+            "Strain into a tall glass and garnish with a celery stick.",
         ],
         alcoholContent=True,
         type="Cocktail",
         imageUrl="https://images.pexels.com/photos/7376796/pexels-photo-7376796.jpeg?auto=compress&cs=tinysrgb&h=350",
-        isFavorite=False
+        isFavorite=False,
     ),
     DrinkRecipe(
         id="9",
@@ -161,16 +161,16 @@ drink_db: List[DrinkRecipe] = [
             Ingredient(name="Orange Curaçao", amount="15ml"),
             Ingredient(name="Orgeat Syrup", amount="15ml"),
             Ingredient(name="Lime Juice", amount="30ml"),
-            Ingredient(name="Mint Leaves", amount="For garnish")
+            Ingredient(name="Mint Leaves", amount="For garnish"),
         ],
         instructions=[
             "Shake all ingredients with ice.",
-            "Strain into a glass filled with crushed ice and garnish with mint leaves."
+            "Strain into a glass filled with crushed ice and garnish with mint leaves.",
         ],
         alcoholContent=True,
         type="Cocktail",
         imageUrl="https://images.pexels.com/photos/11481550/pexels-photo-11481550.jpeg?auto=compress&cs=tinysrgb&h=350",
-        isFavorite=False
+        isFavorite=False,
     ),
     DrinkRecipe(
         id="10",
@@ -179,16 +179,16 @@ drink_db: List[DrinkRecipe] = [
             Ingredient(name="Whiskey", amount="50ml"),
             Ingredient(name="Lemon Juice", amount="25ml"),
             Ingredient(name="Simple Syrup", amount="15ml"),
-            Ingredient(name="Egg White", amount="1")
+            Ingredient(name="Egg White", amount="1"),
         ],
         instructions=[
             "Shake all ingredients without ice to emulsify.",
             "Add ice and shake again.",
-            "Strain into a glass and garnish with a cherry."
+            "Strain into a glass and garnish with a cherry.",
         ],
         alcoholContent=True,
         type="Cocktail",
         imageUrl="https://images.pexels.com/photos/28834354/pexels-photo-28834354.jpeg?auto=compress&cs=tinysrgb&h=350",
-        isFavorite=False
-    )
+        isFavorite=False,
+    ),
 ]

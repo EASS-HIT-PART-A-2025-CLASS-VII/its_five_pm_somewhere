@@ -1,9 +1,11 @@
 from typing import Union, List
 from pydantic import BaseModel
 
+
 class Ingredient(BaseModel):
     name: str
     amount: str  # e.g., "50ml", "1 tsp"
+
 
 class DrinkRecipe(BaseModel):
     id: str
@@ -15,14 +17,17 @@ class DrinkRecipe(BaseModel):
     imageUrl: str
     isFavorite: bool
 
+
 class ErrorResponse(BaseModel):
     error_code: int
     message: str
 
+
 class ImageSearchRequest(BaseModel):
     name: str
-    count: int # Number of images per page
-    page: int # Page number for pagination
+    count: int  # Number of images per page
+    page: int  # Page number for pagination
+
 
 # Unified result type for validation
 DrinkAIResult = Union[DrinkRecipe, ErrorResponse]

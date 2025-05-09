@@ -7,12 +7,19 @@ import uuid
 import random
 
 # Add shared folder to path before importing anything from it
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'shared')))
+sys.path.append(
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "shared"))
+)
 
 # --- Imports ---
-from fastapi import FastAPI, Query, HTTPException
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from shared.models import Ingredient, DrinkRecipe, DrinkAIResult, ErrorResponse, ImageSearchRequest
+from shared.models import (
+    DrinkRecipe,
+    DrinkAIResult,
+    ErrorResponse,
+    ImageSearchRequest,
+)
 from .drink_data import drink_db
 from typing import List
 
@@ -32,7 +39,9 @@ app = FastAPI()
 # --- Middleware ---
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Set up CORS to allow all origins (for development; restrict in production)
+    allow_origins=[
+        "*"
+    ],  # Set up CORS to allow all origins (for development; restrict in production)
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -41,11 +50,11 @@ app.add_middleware(
 # --- AI Agent Setup ---
 PEXELS_BASE_URL = "https://api.pexels.com/v1/search"
 
-pexels_headers = {
-    "Authorization": PEXELS_API_KEY
-}
+pexels_headers = {"Authorization": PEXELS_API_KEY}
 
-llm_model = GroqModel("llama-3.3-70b-versatile", provider=GroqProvider(api_key=GROQ_API_KEY))
+llm_model = GroqModel(
+    "llama-3.3-70b-versatile", provider=GroqProvider(api_key=GROQ_API_KEY)
+)
 
 mixology_agent: Agent[None, DrinkAIResult] = Agent(
     model=llm_model,
@@ -70,44 +79,53 @@ mixology_agent: Agent[None, DrinkAIResult] = Agent(
     deps_type=None,
 )
 
+
 # --- Utility Function ---
 def get_pexels_images(name: str, count: int, page: int):
-    params = {
-        "query": name,
-        "per_page": count,
-        "page": page
-    }
+    params = {"query": name, "per_page": count, "page": page}
 
     response = requests.get(PEXELS_BASE_URL, headers=pexels_headers, params=params)
 
     if response.status_code != 200:
-        return ErrorResponse(error_code=response.status_code, message="Pexels API error: " + response.text)
-    
+        return ErrorResponse(
+            error_code=response.status_code,
+            message="Pexels API error: " + response.text,
+        )
+
     photos = response.json().get("photos", [])
     return [photo["src"]["medium"] for photo in photos]
 
+
 @mixology_agent.result_validator
-async def validate_ai_output(ctx: RunContext[None], result: DrinkAIResult) -> DrinkAIResult:
+async def validate_ai_output(
+    ctx: RunContext[None], result: DrinkAIResult
+) -> DrinkAIResult:
     """Ensure the AI returns a valid drink recipe or a meaningful error."""
 
     # If it's an error object, validate the message exists
     if isinstance(result, ErrorResponse):
         if not result.error_code or not result.message.strip():
-            return ErrorResponse(error_code=500, message="Hmm, the AI had a hiccup and didn’t explain why. Let’s give it another shot!")
+            return ErrorResponse(
+                error_code=500,
+                message="Hmm, the AI had a hiccup and didn’t explain why. Let’s give it another shot!",
+            )
         return result
 
     # Let the model decide if not enough ingredients — only check for schema issues here
     if (
-        not result.name.strip() or
-        not result.ingredients or
-        any(not i.name.strip() or not i.amount.strip() for i in result.ingredients) or
-        not result.instructions or
-        any(not step.strip() for step in result.instructions) or
-        not isinstance(result.alcoholContent, bool) or
-        not result.type.strip()
+        not result.name.strip()
+        or not result.ingredients
+        or any(not i.name.strip() or not i.amount.strip() for i in result.ingredients)
+        or not result.instructions
+        or any(not step.strip() for step in result.instructions)
+        or not isinstance(result.alcoholContent, bool)
+        or not result.type.strip()
     ):
         # Fallback if model tried returning DrinkRecipe but it's broken
-        return ErrorResponse(error_code=500, message="Looks like the recipe’s missing a few important details—maybe the AI got distracted. Try again with a new list of ingredients!")
+        return ErrorResponse(
+            error_code=500,
+            message="Looks like the recipe’s missing a few important details—maybe the AI got distracted. Try again with a new list of ingredients!",
+        )
 
     return result
 
@@ -125,7 +143,10 @@ def fetch_drink_images(request: ImageSearchRequest):
     result = get_pexels_images(request.name, request.count, request.page)
 
     if isinstance(result, ErrorResponse):
-        raise HTTPException(status_code=result.error_code, detail="Looks like our image search is a bit thirsty! No photo this time, but the recipe is still delicious.")
+        raise HTTPException(
+            status_code=result.error_code,
+            detail="Looks like our image search is a bit thirsty! No photo this time, but the recipe is still delicious.",
+        )
 
     return result
 
@@ -135,16 +156,19 @@ def add_new_drink(drink: DrinkRecipe):
     """Add a custom drink recipe to the list."""
 
     if (
-        not drink.name.strip() or
-        not drink.ingredients or
-        any(not i.name.strip() or not i.amount.strip() for i in drink.ingredients) or
-        not drink.instructions or
-        any(not step.strip() for step in drink.instructions) or
-        not isinstance(drink.alcoholContent, bool) or
-        not drink.type.strip() or
-        not drink.imageUrl.startswith("https://") 
+        not drink.name.strip()
+        or not drink.ingredients
+        or any(not i.name.strip() or not i.amount.strip() for i in drink.ingredients)
+        or not drink.instructions
+        or any(not step.strip() for step in drink.instructions)
+        or not isinstance(drink.alcoholContent, bool)
+        or not drink.type.strip()
+        or not drink.imageUrl.startswith("https://")
     ):
-        raise HTTPException( status_code=400, detail="Looks like some details are missing or incomplete in the drink recipe. Please make sure to provide all necessary information like the name, ingredients, instructions, and image URL. Don't worry, we’ve got you covered!")
+        raise HTTPException(
+            status_code=400,
+            detail="Looks like some details are missing or incomplete in the drink recipe. Please make sure to provide all necessary information like the name, ingredients, instructions, and image URL. Don't worry, we’ve got you covered!",
+        )
 
     drink.id = str(uuid.uuid4())
     drink_db.append(drink)
@@ -158,7 +182,10 @@ def toggle_favorite_status(drink_id: str):
         if drink.id == drink_id:
             drink.isFavorite = not drink.isFavorite
             return drink
-    raise HTTPException(status_code=404, detail="Hmm, we couldn’t find that drink. Maybe it got shaken, not stirred?")
+    raise HTTPException(
+        status_code=404,
+        detail="Hmm, we couldn’t find that drink. Maybe it got shaken, not stirred?",
+    )
 
 
 @app.get("/drinks/random", response_model=DrinkRecipe)
@@ -178,14 +205,17 @@ def generate_drink_from_ingredients(ingredients: List[str]):
     ai_result = mixology_agent.run_sync(user_prompt)
 
     if isinstance(ai_result.data, ErrorResponse):
-            raise HTTPException(status_code=422, detail=ai_result.data.message)
+        raise HTTPException(status_code=422, detail=ai_result.data.message)
 
     new_drink = ai_result.data
-    
+
     result = get_pexels_images(new_drink.name, 1, 1)
 
     if isinstance(result, ErrorResponse):
-        raise HTTPException(status_code=result.error_code, detail="Oops! Something went wrong while fetching images for your drink. Please try again later!")
+        raise HTTPException(
+            status_code=result.error_code,
+            detail="Oops! Something went wrong while fetching images for your drink. Please try again later!",
+        )
 
     new_drink.imageUrl = result[0]
     new_drink.id = str(uuid.uuid4())
