@@ -12,6 +12,25 @@ from app.main import drink_db
 
 client = TestClient(app)
 
+mock_drink = DrinkRecipe(
+    id="0",
+    name="Mocktail Delight",
+    ingredients=[
+        Ingredient(name="apple juice", amount="50ml"),
+        Ingredient(name="lime", amount="1 slice"),
+        Ingredient(name="mint", amount="5 leaves"),
+    ],
+    instructions=["Mix all ingredients", "Shake well", "Serve over ice"],
+    alcoholContent=False,
+    type="Mocktail",
+    imageUrl="0",
+    isFavorite=False,
+)
+
+
+class MockResult:
+    output = mock_drink
+
 
 # @app.get("/drinks")
 def test_list_all_drinks_success():
@@ -177,25 +196,8 @@ def test_generate_drink_success():
     original_drinks = drink_db.copy()
 
     try:
-        # Setup test data
-        mock_drink = DrinkRecipe(
-            id="0",
-            name="Mocktail Delight",
-            ingredients=[
-                Ingredient(name="apple juice", amount="50ml"),
-                Ingredient(name="lime", amount="1 slice"),
-                Ingredient(name="mint", amount="5 leaves"),
-            ],
-            instructions=["Mix all ingredients", "Shake well", "Serve over ice"],
-            alcoholContent=False,
-            type="Mocktail",
-            imageUrl="0",
-            isFavorite=False,
-        )
-
         # Create a mock AI result object that matches what mixology_agent returns
-        mock_ai_result = MagicMock()
-        mock_ai_result.data = mock_drink  # Directly assign the DrinkRecipe
+        mock_ai_result = MockResult()
 
         mock_image_url = "https://images.pexels.com/photos/mock-image.jpg"
 

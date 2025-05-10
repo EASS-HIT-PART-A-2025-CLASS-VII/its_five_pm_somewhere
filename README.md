@@ -27,8 +27,3 @@ Save your favorite recipes for future use or create your own custom drink recipe
 # docker-compose down
 # docker-compose logs
 # docker ps
-
-
-- how to run tests using docker
-docker-compose up --build test --abort-on-container-exit --exit-code-from test
-docker-compose down

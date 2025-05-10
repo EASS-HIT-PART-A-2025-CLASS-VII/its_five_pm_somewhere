@@ -71,7 +71,7 @@ mixology_agent: Agent[None, DrinkAIResult] = Agent(
         "- imageUrl is not relevant, so set it to '0'.\n"
         "- Do not make up or invent ingredients; only use the provided list (or a subset if necessary)."
     ),
-    result_type=DrinkAIResult,
+    output_type=DrinkAIResult,
     deps_type=None,
 )
 
@@ -92,7 +92,7 @@ def get_pexels_images(name: str, count: int, page: int):
     return [photo["src"]["medium"] for photo in photos]
 
 
-@mixology_agent.result_validator
+@mixology_agent.output_validator
 async def validate_ai_output(
     ctx: RunContext[None], result: DrinkAIResult
 ) -> DrinkAIResult:
@@ -200,10 +200,10 @@ def generate_drink_from_ingredients(ingredients: List[str]):
 
     ai_result = mixology_agent.run_sync(user_prompt)
 
-    if isinstance(ai_result.data, ErrorResponse):
-        raise HTTPException(status_code=422, detail=ai_result.data.message)
+    if isinstance(ai_result.output, ErrorResponse):
+        raise HTTPException(status_code=422, detail=ai_result.output.message)
 
-    new_drink = ai_result.data
+    new_drink = ai_result.output
 
     result = get_pexels_images(new_drink.name, 1, 1)
 
