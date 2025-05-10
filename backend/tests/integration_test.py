@@ -4,15 +4,11 @@ from unittest.mock import patch, MagicMock
 # from app.main import app
 import uuid
 
-import sys
-import os
+from app.models import Ingredient, DrinkRecipe
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
-from shared.models import Ingredient, DrinkRecipe
-
-from backend.app.main import app, mixology_agent, get_pexels_images
+from app.main import app, mixology_agent, get_pexels_images
 from fastapi.testclient import TestClient
-from backend.app.main import drink_db  # or wherever it's defined
+from app.main import drink_db
 
 client = TestClient(app)
 
@@ -206,7 +202,7 @@ def test_generate_drink_success():
         # Mock dependencies
         with patch.object(
             mixology_agent, "run_sync", return_value=mock_ai_result
-        ), patch("backend.app.main.get_pexels_images", return_value=[mock_image_url]):
+        ), patch("app.main.get_pexels_images", return_value=[mock_image_url]):
 
             # Call endpoint
             response = client.post(

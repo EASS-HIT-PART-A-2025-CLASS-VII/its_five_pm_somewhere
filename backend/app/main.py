@@ -1,25 +1,21 @@
 # --- System and utilities ---
 import os
-import sys
 import requests
 from dotenv import load_dotenv
 import uuid
 import random
 
-# Add shared folder to path before importing anything from it
-sys.path.append(
-    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "shared"))
-)
-
 # --- Imports ---
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from shared.models import (
+from app.models import (
+    Ingredient,
     DrinkRecipe,
-    DrinkAIResult,
     ErrorResponse,
     ImageSearchRequest,
+    DrinkAIResult,
 )
+
 from .drink_data import drink_db
 from typing import List
 
