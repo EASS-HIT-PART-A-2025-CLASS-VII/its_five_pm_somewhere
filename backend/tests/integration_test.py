@@ -1,7 +1,7 @@
 from unittest.mock import patch
 import uuid
 
-from app.models import Ingredient, DrinkRecipe
+from app.models import Ingredient, DrinkRecipe, DrinkType
 from app.main import app, mixology_agent
 from fastapi.testclient import TestClient
 from app.main import drink_db
@@ -18,8 +18,8 @@ mock_drink = DrinkRecipe(
     ],
     instructions=["Mix all ingredients", "Shake well", "Serve over ice"],
     alcoholContent=False,
-    type="Mocktail",
-    imageUrl="0",
+    type=DrinkType.MOCKTAIL,
+    imageUrl="https://images.pexels.com/photos/11481550/pexels-photo-11481550.jpeg?auto=compress&cs=tinysrgb&h=350",
     isFavorite=False,
 )
 
@@ -59,8 +59,8 @@ def test_add_new_drink_success():
         ],
         "instructions": ["Pour orange juice", "Add grenadine", "Serve with ice"],
         "alcoholContent": False,
-        "type": "Mocktail",
-        "imageUrl": "https://example.com/image.jpg",
+        "type": DrinkType.MOCKTAIL,
+        "imageUrl": "https://images.pexels.com/photos/11481550/pexels-photo-11481550.jpeg?auto=compress&cs=tinysrgb&h=350",
         "isFavorite": False,
     }
 
@@ -83,8 +83,12 @@ def test_add_new_drink_missing_fields_error():
         "isFavorite": False,
     }
     response = client.post("/drinks", json=broken_drink)
-    assert response.status_code == 400
-    assert "Looks like some details are missing" in response.text
+    assert response.status_code == 422
+    data = response.json()
+    assert any(
+        "String should have at least 2 characters" in str(msg) for msg in data["detail"]
+    )
+    assert any("List should have at least 1 item" in str(msg) for msg in data["detail"])
 
 
 # @app.patch("/drinks/{drink_id}/favorite")
@@ -102,8 +106,8 @@ def test_toggle_favorite_status_success():
             ],
             instructions=["Shake it well!"],
             alcoholContent=True,
-            type="Cocktail",
-            imageUrl="https://example.com/image.jpg",
+            type=DrinkType.COCKTAIL,
+            imageUrl="https://images.pexels.com/photos/11481550/pexels-photo-11481550.jpeg?auto=compress&cs=tinysrgb&h=350",
             isFavorite=False,
         )
         drink_db.append(drink)
@@ -144,8 +148,8 @@ def test_get_random_drink_success():
             ],
             instructions=["Shake it well!"],
             alcoholContent=True,
-            type="Cocktail",
-            imageUrl="https://example.com/image.jpg",
+            type=DrinkType.COCKTAIL,
+            imageUrl="https://images.pexels.com/photos/11481550/pexels-photo-11481550.jpeg?auto=compress&cs=tinysrgb&h=350",
             isFavorite=False,
         )
         drink_db.append(test_drink)
@@ -185,7 +189,7 @@ def test_generate_drink_success():
             returned_drink = DrinkRecipe(**data)
 
             assert returned_drink.name == "Mocktail Delight"
-            assert returned_drink.imageUrl == mock_image_url
+            assert str(returned_drink.imageUrl) == mock_image_url
             assert returned_drink.id != "0"
             assert len(returned_drink.ingredients) == 3
             assert any(

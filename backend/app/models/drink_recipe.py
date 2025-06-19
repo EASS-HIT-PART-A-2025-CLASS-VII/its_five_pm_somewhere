@@ -1,14 +1,16 @@
 from typing import List
+from pydantic import BaseModel, Field, HttpUrl
+
 from .ingredient import Ingredient
-from pydantic import BaseModel
+from .drink_type import DrinkType
 
 
 class DrinkRecipe(BaseModel):
     id: str
-    name: str
-    ingredients: List[Ingredient]
-    instructions: List[str]
+    name: str = Field(..., min_length=2)
+    ingredients: List[Ingredient] = Field(..., min_length=1)
+    instructions: List[str] = Field(..., min_length=1)
     alcoholContent: bool
-    type: str  # e.g., "Cocktail", "Mocktail", "Shot"
-    imageUrl: str
+    type: DrinkType
+    imageUrl: HttpUrl
     isFavorite: bool
