@@ -1,11 +1,9 @@
-# --- System and utilities ---
 import os
 import requests
 from dotenv import load_dotenv
 import uuid
 import random
 
-# --- Imports ---
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from app.models import (
@@ -19,7 +17,6 @@ from app.models import (
 from .drink_data import drink_db
 from typing import List
 
-# Pydantic AI dependencies
 from pydantic_ai import Agent, RunContext, ModelRetry
 from pydantic_ai.models.groq import GroqModel
 from pydantic_ai.providers.groq import GroqProvider
@@ -28,6 +25,7 @@ from pydantic_ai.providers.groq import GroqProvider
 load_dotenv()
 PEXELS_API_KEY = os.getenv("PEXELS_API_KEY", "")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+PEXELS_BASE_URL = "https://api.pexels.com/v1/search"
 
 # --- FastAPI App Initialization ---
 app = FastAPI()
@@ -44,8 +42,6 @@ app.add_middleware(
 )
 
 # --- AI Agent Setup ---
-PEXELS_BASE_URL = "https://api.pexels.com/v1/search"
-
 pexels_headers = {"Authorization": PEXELS_API_KEY}
 
 llm_model = GroqModel(
