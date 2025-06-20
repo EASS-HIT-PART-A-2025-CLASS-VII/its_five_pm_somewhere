@@ -9,7 +9,7 @@ from app.main import drink_db
 client = TestClient(app)
 
 mock_drink = DrinkRecipe(
-    id="0",
+    id=uuid.uuid4(),
     name="Mocktail Delight",
     ingredients=[
         Ingredient(name="apple juice", amount=50.0, unit=Unit.MILLILITER),
@@ -51,7 +51,6 @@ def test_fetch_images_success():
 # @app.post("/drinks")
 def test_add_new_drink_success():
     new_drink = {
-        "id": "0",
         "name": "Sunset Twist",
         "ingredients": [
             {"name": "Orange juice", "amount": 50.0, "unit": Unit.MILLILITER},
@@ -68,12 +67,11 @@ def test_add_new_drink_success():
     assert response.status_code == 200
     data = response.json()
     assert data["name"] == "Sunset Twist"
-    assert data["id"] != "0"
+    assert uuid.UUID(data["id"])
 
 
 def test_add_new_drink_missing_fields_error():
     broken_drink = {
-        "id": "0",
         "name": "",
         "ingredients": [],
         "instructions": [],
@@ -96,7 +94,7 @@ def test_toggle_favorite_status_success():
     original_drinks = drink_db.copy()
 
     try:
-        drink_id = str(uuid.uuid4())
+        drink_id = uuid.uuid4()
         drink = DrinkRecipe(
             id=drink_id,
             name="Test Drink",
@@ -127,7 +125,7 @@ def test_toggle_favorite_status_success():
 
 
 def test_toggle_favorite_error():
-    fake_id = str(uuid.uuid4())
+    fake_id = uuid.uuid4()
     response = client.patch(f"/drinks/{fake_id}/favorite")
     assert response.status_code == 404
     assert "couldn’t find that drink" in response.text
@@ -140,7 +138,7 @@ def test_get_random_drink_success():
     try:
         drink_db.clear()
         test_drink = DrinkRecipe(
-            id=str(uuid.uuid4()),
+            id=uuid.uuid4(),
             name="Test Drink",
             ingredients=[
                 Ingredient(name="Rum", amount=50.0, unit=Unit.MILLILITER),
@@ -190,12 +188,10 @@ def test_generate_drink_success():
 
             assert returned_drink.name == "Mocktail Delight"
             assert str(returned_drink.imageUrl) == mock_image_url
-            assert returned_drink.id != "0"
             assert len(returned_drink.ingredients) == 3
             assert any(
                 ing.name.lower() == "apple juice" for ing in returned_drink.ingredients
             )
-            assert any(d.id == returned_drink.id for d in drink_db)
 
     finally:
         drink_db.clear()

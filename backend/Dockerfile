@@ -8,11 +8,11 @@ WORKDIR /app
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy entire app
+# Copy entire app and tests (to run tests inside container)
 COPY backend/app ./app
 COPY backend/tests ./tests
 
 EXPOSE 8000
 
-# Run FastAPI app
+# Run FastAPI app 
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -5,8 +5,8 @@ services:
       dockerfile: backend/Dockerfile
     ports:
       - "8000:8000"
-    networks:
-      - app-network
+    volumes:
+      - ./backend:/app
     env_file:
       - ./backend/.env
 
@@ -17,8 +17,6 @@ services:
       # - "4173:4173" #for builds
     environment:
       - VITE_REACT_APP_BACKEND_URL=http://localhost:8000
-    networks:
-      - app-network
     depends_on:
       - backend
 
@@ -28,13 +26,8 @@ services:
       dockerfile: backend/Dockerfile
     depends_on:
       - backend
-    networks:
-      - app-network
     command: [ "pytest", "tests/integration_test.py", "-v" ]
     env_file:
       - ./backend/.env
     environment:
-      - PYTHONPATH=/app # Adjust this path as per the container's filesystem
-
-networks:
-  app-network:
+      - PYTHONPATH=/app

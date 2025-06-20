@@ -27,3 +27,6 @@ Save your favorite recipes for future use or create your own custom drink recipe
 # docker-compose down
 # docker-compose logs
 # docker ps
+
+how to see the test
+docker-compose up test
