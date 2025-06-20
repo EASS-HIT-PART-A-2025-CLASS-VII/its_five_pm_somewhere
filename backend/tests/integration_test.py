@@ -1,7 +1,7 @@
 from unittest.mock import patch
 import uuid
 
-from app.models import Ingredient, DrinkRecipe, DrinkType
+from app.models import Ingredient, DrinkRecipe, DrinkType, Unit
 from app.main import app, mixology_agent
 from fastapi.testclient import TestClient
 from app.main import drink_db
@@ -12,9 +12,9 @@ mock_drink = DrinkRecipe(
     id="0",
     name="Mocktail Delight",
     ingredients=[
-        Ingredient(name="apple juice", amount="50ml"),
-        Ingredient(name="lime", amount="1 slice"),
-        Ingredient(name="mint", amount="5 leaves"),
+        Ingredient(name="apple juice", amount=50.0, unit=Unit.MILLILITER),
+        Ingredient(name="lime", amount=1.0, unit=Unit.PIECE),
+        Ingredient(name="mint", amount=5.0, unit=Unit.PIECE),
     ],
     instructions=["Mix all ingredients", "Shake well", "Serve over ice"],
     alcoholContent=False,
@@ -54,8 +54,8 @@ def test_add_new_drink_success():
         "id": "0",
         "name": "Sunset Twist",
         "ingredients": [
-            {"name": "Orange juice", "amount": "50ml"},
-            {"name": "Grenadine", "amount": "10ml"},
+            {"name": "Orange juice", "amount": 50.0, "unit": Unit.MILLILITER},
+            {"name": "Grenadine", "amount": 10.0, "unit": Unit.MILLILITER},
         ],
         "instructions": ["Pour orange juice", "Add grenadine", "Serve with ice"],
         "alcoholContent": False,
@@ -101,8 +101,8 @@ def test_toggle_favorite_status_success():
             id=drink_id,
             name="Test Drink",
             ingredients=[
-                Ingredient(name="Rum", amount="50ml"),
-                Ingredient(name="Mint", amount="5 leaves"),
+                Ingredient(name="Rum", amount=50.0, unit=Unit.MILLILITER),
+                Ingredient(name="Mint", amount=5.0, unit=Unit.PIECE),
             ],
             instructions=["Shake it well!"],
             alcoholContent=True,
@@ -143,8 +143,8 @@ def test_get_random_drink_success():
             id=str(uuid.uuid4()),
             name="Test Drink",
             ingredients=[
-                Ingredient(name="Rum", amount="50ml"),
-                Ingredient(name="Mint", amount="5 leaves"),
+                Ingredient(name="Rum", amount=50.0, unit=Unit.MILLILITER),
+                Ingredient(name="Mint", amount=5.0, unit=Unit.PIECE),
             ],
             instructions=["Shake it well!"],
             alcoholContent=True,

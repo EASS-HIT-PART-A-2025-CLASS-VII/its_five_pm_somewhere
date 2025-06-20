@@ -46,7 +46,8 @@ app.add_middleware(
 pexels_headers = {"Authorization": PEXELS_API_KEY}
 
 llm_model = GroqModel(
-    "llama-3.3-70b-versatile", provider=GroqProvider(api_key=GROQ_API_KEY)
+    "meta-llama/llama-4-scout-17b-16e-instruct",
+    provider=GroqProvider(api_key=GROQ_API_KEY),
 )
 drink_type_values = [d.value for d in DrinkType]
 
@@ -60,7 +61,9 @@ mixology_agent: Agent[None, DrinkAIResult] = Agent(
         "with a helpful error_message explaining why.\n\n"
         "Return a valid DrinkRecipe object with:\n"
         "- A creative and fitting name.\n"
-        "- Logical and realistic ingredients (amount + name).\n"
+        "- Logical and realistic ingredients with:\n"
+        "   - amount: float (e.g., 50.0)\n"
+        "   - unit: EXACTLY one of: 'g', 'ml', 'tsp', 'tbsp', 'piece', 'dash', 'top_up'\n"
         "- Clear, step-by-step instructions.\n"
         "- alcoholContent set to true if any ingredient contains alcohol.\n"
         "- A fitting type using EXACTLY one of these values: "
@@ -68,7 +71,7 @@ mixology_agent: Agent[None, DrinkAIResult] = Agent(
         + ".\n"
         "- isFavorite should always be false.\n"
         "- id is not relevant, so set it to '0'.\n"
-        "- imageUrl is not relevant, so set it to '0'.\n"
+        "- imageUrl is not relevant, so set it to None.\n"
         "- Do not make up or invent ingredients; only use the provided list (or a subset if necessary)."
     ),
     output_type=DrinkAIResult,

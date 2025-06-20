@@ -1,5 +1,5 @@
 from typing import List
-from app.models import Ingredient, DrinkRecipe, DrinkType
+from app.models import Ingredient, DrinkRecipe, DrinkType, Unit
 
 # --- In-Memory Store ---
 drink_db: List[DrinkRecipe] = [
@@ -7,11 +7,11 @@ drink_db: List[DrinkRecipe] = [
         id="777",
         name="Mojito",
         ingredients=[
-            Ingredient(name="White Rum", amount="50ml"),
-            Ingredient(name="Mint Leaves", amount="10 leaves"),
-            Ingredient(name="Lime", amount="1/2"),
-            Ingredient(name="Sugar", amount="2 tsp"),
-            Ingredient(name="Club Soda", amount="Top it up"),
+            Ingredient(name="White Rum", amount=50, unit=Unit.MILLILITER),
+            Ingredient(name="Mint Leaves", amount=10, unit=Unit.PIECE),
+            Ingredient(name="Lime", amount=0.5, unit=Unit.PIECE),
+            Ingredient(name="Sugar", amount=2, unit=Unit.TEASPOON),
+            Ingredient(name="Club Soda", amount=1, unit=Unit.TOP_UP),
         ],
         instructions=[
             "Muddle mint leaves and sugar in a glass.",
@@ -28,9 +28,9 @@ drink_db: List[DrinkRecipe] = [
         id="2",
         name="Martini",
         ingredients=[
-            Ingredient(name="Gin", amount="60ml"),
-            Ingredient(name="Dry Vermouth", amount="10ml"),
-            Ingredient(name="Olive", amount="1"),
+            Ingredient(name="Gin", amount=60, unit=Unit.MILLILITER),
+            Ingredient(name="Dry Vermouth", amount=10, unit=Unit.MILLILITER),
+            Ingredient(name="Olive", amount=1, unit=Unit.PIECE),
         ],
         instructions=[
             "Pour gin and dry vermouth into a mixing glass.",
@@ -46,9 +46,9 @@ drink_db: List[DrinkRecipe] = [
         id="3",
         name="Gin and Tonic",
         ingredients=[
-            Ingredient(name="Gin", amount="50ml"),
-            Ingredient(name="Tonic Water", amount="Top it up"),
-            Ingredient(name="Lime", amount="1/4"),
+            Ingredient(name="Gin", amount=50, unit=Unit.MILLILITER),
+            Ingredient(name="Tonic Water", amount=1, unit=Unit.TOP_UP),
+            Ingredient(name="Lime", amount=0.25, unit=Unit.PIECE),
         ],
         instructions=[
             "Pour gin into a glass filled with ice.",
@@ -64,10 +64,10 @@ drink_db: List[DrinkRecipe] = [
         id="4",
         name="Old Fashioned",
         ingredients=[
-            Ingredient(name="Bourbon", amount="50ml"),
-            Ingredient(name="Sugar", amount="1 tsp"),
-            Ingredient(name="Angostura Bitters", amount="2 dashes"),
-            Ingredient(name="Orange Peel", amount="1 piece"),
+            Ingredient(name="Bourbon", amount=50, unit=Unit.MILLILITER),
+            Ingredient(name="Sugar", amount=1, unit=Unit.TEASPOON),
+            Ingredient(name="Angostura Bitters", amount=2, unit=Unit.DASH),
+            Ingredient(name="Orange Peel", amount=1, unit=Unit.PIECE),
         ],
         instructions=[
             "Muddle the sugar and bitters in a glass.",
@@ -83,10 +83,10 @@ drink_db: List[DrinkRecipe] = [
         id="5",
         name="Piña Colada",
         ingredients=[
-            Ingredient(name="White Rum", amount="50ml"),
-            Ingredient(name="Coconut Cream", amount="30ml"),
-            Ingredient(name="Pineapple Juice", amount="90ml"),
-            Ingredient(name="Pineapple Slice", amount="1 piece"),
+            Ingredient(name="White Rum", amount=50, unit=Unit.MILLILITER),
+            Ingredient(name="Coconut Cream", amount=30, unit=Unit.MILLILITER),
+            Ingredient(name="Pineapple Juice", amount=90, unit=Unit.MILLILITER),
+            Ingredient(name="Pineapple Slice", amount=1, unit=Unit.PIECE),
         ],
         instructions=[
             "Blend all ingredients with ice.",
@@ -101,10 +101,10 @@ drink_db: List[DrinkRecipe] = [
         id="6",
         name="Margarita",
         ingredients=[
-            Ingredient(name="Tequila", amount="50ml"),
-            Ingredient(name="Lime Juice", amount="30ml"),
-            Ingredient(name="Triple Sec", amount="20ml"),
-            Ingredient(name="Salt", amount="For the rim"),
+            Ingredient(name="Tequila", amount=50, unit=Unit.MILLILITER),
+            Ingredient(name="Lime Juice", amount=30, unit=Unit.MILLILITER),
+            Ingredient(name="Triple Sec", amount=20, unit=Unit.MILLILITER),
+            Ingredient(name="Salt", amount=1, unit=Unit.TOP_UP),
         ],
         instructions=[
             "Rub a lime wedge around the rim of a glass and dip it in salt.",
@@ -120,10 +120,10 @@ drink_db: List[DrinkRecipe] = [
         id="7",
         name="Cosmopolitan",
         ingredients=[
-            Ingredient(name="Vodka", amount="45ml"),
-            Ingredient(name="Triple Sec", amount="15ml"),
-            Ingredient(name="Lime Juice", amount="15ml"),
-            Ingredient(name="Cranberry Juice", amount="30ml"),
+            Ingredient(name="Vodka", amount=45, unit=Unit.MILLILITER),
+            Ingredient(name="Triple Sec", amount=15, unit=Unit.MILLILITER),
+            Ingredient(name="Lime Juice", amount=15, unit=Unit.MILLILITER),
+            Ingredient(name="Cranberry Juice", amount=30, unit=Unit.MILLILITER),
         ],
         instructions=[
             "Shake all ingredients with ice.",
@@ -138,11 +138,11 @@ drink_db: List[DrinkRecipe] = [
         id="8",
         name="Bloody Mary",
         ingredients=[
-            Ingredient(name="Vodka", amount="50ml"),
-            Ingredient(name="Tomato Juice", amount="100ml"),
-            Ingredient(name="Lemon Juice", amount="15ml"),
-            Ingredient(name="Tabasco Sauce", amount="Few dashes"),
-            Ingredient(name="Worcestershire Sauce", amount="Few dashes"),
+            Ingredient(name="Vodka", amount=50, unit=Unit.MILLILITER),
+            Ingredient(name="Tomato Juice", amount=100, unit=Unit.MILLILITER),
+            Ingredient(name="Lemon Juice", amount=15, unit=Unit.MILLILITER),
+            Ingredient(name="Tabasco Sauce", amount=2, unit=Unit.DASH),
+            Ingredient(name="Worcestershire Sauce", amount=2, unit=Unit.DASH),
         ],
         instructions=[
             "Shake all ingredients with ice.",
@@ -157,11 +157,11 @@ drink_db: List[DrinkRecipe] = [
         id="9",
         name="Mai Tai",
         ingredients=[
-            Ingredient(name="Rum", amount="30ml"),
-            Ingredient(name="Orange Curaçao", amount="15ml"),
-            Ingredient(name="Orgeat Syrup", amount="15ml"),
-            Ingredient(name="Lime Juice", amount="30ml"),
-            Ingredient(name="Mint Leaves", amount="For garnish"),
+            Ingredient(name="Rum", amount=30, unit=Unit.MILLILITER),
+            Ingredient(name="Orange Curaçao", amount=15, unit=Unit.MILLILITER),
+            Ingredient(name="Orgeat Syrup", amount=15, unit=Unit.MILLILITER),
+            Ingredient(name="Lime Juice", amount=30, unit=Unit.MILLILITER),
+            Ingredient(name="Mint Leaves", amount=2, unit=Unit.PIECE),
         ],
         instructions=[
             "Shake all ingredients with ice.",
@@ -176,10 +176,10 @@ drink_db: List[DrinkRecipe] = [
         id="10",
         name="Whiskey Sour",
         ingredients=[
-            Ingredient(name="Whiskey", amount="50ml"),
-            Ingredient(name="Lemon Juice", amount="25ml"),
-            Ingredient(name="Simple Syrup", amount="15ml"),
-            Ingredient(name="Egg White", amount="1"),
+            Ingredient(name="Whiskey", amount=50, unit=Unit.MILLILITER),
+            Ingredient(name="Lemon Juice", amount=25, unit=Unit.MILLILITER),
+            Ingredient(name="Simple Syrup", amount=15, unit=Unit.MILLILITER),
+            Ingredient(name="Egg White", amount=1, unit=Unit.PIECE),
         ],
         instructions=[
             "Shake all ingredients without ice to emulsify.",

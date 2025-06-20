@@ -1,6 +1,18 @@
 from pydantic import BaseModel
+from enum import Enum
+
+
+class Unit(str, Enum):
+    GRAM = "g"
+    MILLILITER = "ml"
+    TEASPOON = "tsp"
+    TABLESPOON = "tbsp"
+    PIECE = "piece"
+    DASH = "dash"
+    TOP_UP = "top_up"
 
 
 class Ingredient(BaseModel):
     name: str
-    amount: str  # e.g., "50ml", "1 tsp"
+    amount: float
+    unit: Unit

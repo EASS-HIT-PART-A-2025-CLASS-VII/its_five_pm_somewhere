@@ -1,8 +1,20 @@
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel, Field, HttpUrl
+from enum import Enum
 
 from .ingredient import Ingredient
-from .drink_type import DrinkType
+
+
+class DrinkType(str, Enum):
+    COCKTAIL = "Cocktail"
+    MOCKTAIL = "Mocktail"
+    SHOT = "Shot"
+    SMOOTHIE = "Smoothie"
+    MILKSHAKE = "Milkshake"
+    PUNCH = "Punch"
+    COFFEE_DRINK = "Coffee Drink"
+    TEA_DRINK = "Tea Drink"
+    HOT_CHOCOLATE = "Hot Chocolate"
 
 
 class DrinkRecipe(BaseModel):
@@ -12,5 +24,5 @@ class DrinkRecipe(BaseModel):
     instructions: List[str] = Field(..., min_length=1)
     alcoholContent: bool
     type: DrinkType
-    imageUrl: HttpUrl
+    imageUrl: Optional[HttpUrl] = None
     isFavorite: bool
