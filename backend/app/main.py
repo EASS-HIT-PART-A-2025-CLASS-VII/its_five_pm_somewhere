@@ -1,5 +1,5 @@
 import os
-import requests
+import httpx
 from dotenv import load_dotenv
 import uuid
 import random
@@ -7,7 +7,6 @@ import random
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from app.models import (
-    Ingredient,
     DrinkRecipe,
     ErrorResponse,
     ImageSearchRequest,
@@ -19,7 +18,7 @@ from app.models import (
 from .drink_data import drink_db
 from typing import List
 
-from pydantic_ai import Agent, RunContext, ModelRetry
+from pydantic_ai import Agent, RunContext
 from pydantic_ai.models.groq import GroqModel
 from pydantic_ai.providers.groq import GroqProvider
 
@@ -86,7 +85,7 @@ mixology_agent: Agent[None, DrinkAIResult] = Agent(
 def get_pexels_images(name: str, count: int, page: int):
     params = {"query": name, "per_page": count, "page": page}
 
-    response = requests.get(PEXELS_BASE_URL, headers=pexels_headers, params=params)
+    response = httpx.get(PEXELS_BASE_URL, headers=pexels_headers, params=params)
 
     if response.status_code != 200:
         return ErrorResponse(
