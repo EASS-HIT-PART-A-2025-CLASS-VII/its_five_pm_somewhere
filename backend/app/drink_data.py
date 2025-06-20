@@ -4,7 +4,6 @@ from app.models import Ingredient, DrinkRecipe, DrinkType, Unit
 # --- In-Memory Store ---
 drink_db: List[DrinkRecipe] = [
     DrinkRecipe(
-        id="777",
         name="Mojito",
         ingredients=[
             Ingredient(name="White Rum", amount=50, unit=Unit.MILLILITER),
@@ -25,7 +24,6 @@ drink_db: List[DrinkRecipe] = [
         isFavorite=False,
     ),
     DrinkRecipe(
-        id="2",
         name="Martini",
         ingredients=[
             Ingredient(name="Gin", amount=60, unit=Unit.MILLILITER),
@@ -43,7 +41,6 @@ drink_db: List[DrinkRecipe] = [
         isFavorite=False,
     ),
     DrinkRecipe(
-        id="3",
         name="Gin and Tonic",
         ingredients=[
             Ingredient(name="Gin", amount=50, unit=Unit.MILLILITER),
@@ -61,7 +58,6 @@ drink_db: List[DrinkRecipe] = [
         isFavorite=False,
     ),
     DrinkRecipe(
-        id="4",
         name="Old Fashioned",
         ingredients=[
             Ingredient(name="Bourbon", amount=50, unit=Unit.MILLILITER),
@@ -80,7 +76,6 @@ drink_db: List[DrinkRecipe] = [
         isFavorite=False,
     ),
     DrinkRecipe(
-        id="5",
         name="Piña Colada",
         ingredients=[
             Ingredient(name="White Rum", amount=50, unit=Unit.MILLILITER),
@@ -98,7 +93,6 @@ drink_db: List[DrinkRecipe] = [
         isFavorite=False,
     ),
     DrinkRecipe(
-        id="6",
         name="Margarita",
         ingredients=[
             Ingredient(name="Tequila", amount=50, unit=Unit.MILLILITER),
@@ -117,7 +111,6 @@ drink_db: List[DrinkRecipe] = [
         isFavorite=False,
     ),
     DrinkRecipe(
-        id="7",
         name="Cosmopolitan",
         ingredients=[
             Ingredient(name="Vodka", amount=45, unit=Unit.MILLILITER),
@@ -135,7 +128,6 @@ drink_db: List[DrinkRecipe] = [
         isFavorite=False,
     ),
     DrinkRecipe(
-        id="8",
         name="Bloody Mary",
         ingredients=[
             Ingredient(name="Vodka", amount=50, unit=Unit.MILLILITER),
@@ -154,7 +146,6 @@ drink_db: List[DrinkRecipe] = [
         isFavorite=False,
     ),
     DrinkRecipe(
-        id="9",
         name="Mai Tai",
         ingredients=[
             Ingredient(name="Rum", amount=30, unit=Unit.MILLILITER),
@@ -173,7 +164,6 @@ drink_db: List[DrinkRecipe] = [
         isFavorite=False,
     ),
     DrinkRecipe(
-        id="10",
         name="Whiskey Sour",
         ingredients=[
             Ingredient(name="Whiskey", amount=50, unit=Unit.MILLILITER),

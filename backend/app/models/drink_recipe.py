@@ -1,6 +1,7 @@
 from typing import List, Optional
 from pydantic import BaseModel, Field, HttpUrl
 from enum import Enum
+from uuid import UUID, uuid4
 
 from .ingredient import Ingredient
 
@@ -18,7 +19,7 @@ class DrinkType(str, Enum):
 
 
 class DrinkRecipe(BaseModel):
-    id: str
+    id: Optional[UUID] = Field(default_factory=uuid4)
     name: str = Field(..., min_length=2)
     ingredients: List[Ingredient] = Field(..., min_length=1)
     instructions: List[str] = Field(..., min_length=1)

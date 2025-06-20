@@ -13,6 +13,7 @@ from app.models import (
     ImageSearchRequest,
     DrinkAIResult,
     DrinkType,
+    Unit,
 )
 
 from .drink_data import drink_db
@@ -50,29 +51,31 @@ llm_model = GroqModel(
     provider=GroqProvider(api_key=GROQ_API_KEY),
 )
 drink_type_values = [d.value for d in DrinkType]
+units_values = [u.value for u in Unit]
 
 mixology_agent: Agent[None, DrinkAIResult] = Agent(
     model=llm_model,
     system_prompt=(
         "You are a professional mixologist assistant. "
         "Given a list of ingredient names, generate a creative and well-balanced drink recipe. "
-        "You may ignore ingredients that do not fit well together or are not relevant. "
+        "Only use ingredients that are included in the provided list. "
+        "Do not add any ingredients in the instructions or recipe that are not present in the ingredients list. "
         "If the ingredients are insufficient to create a proper drink, return an ErrorResponse object "
         "with a helpful error_message explaining why.\n\n"
         "Return a valid DrinkRecipe object with:\n"
-        "- A creative and fitting name.\n"
+        "- A creative, descriptive drink name that matches the drink and would return a relevant drink image when searched.\n"
         "- Logical and realistic ingredients with:\n"
         "   - amount: float (e.g., 50.0)\n"
-        "   - unit: EXACTLY one of: 'g', 'ml', 'tsp', 'tbsp', 'piece', 'dash', 'top_up'\n"
+        "   - unit: EXACTLY one of these values: " + ", ".join(units_values) + ".\n"
         "- Clear, step-by-step instructions.\n"
         "- alcoholContent set to true if any ingredient contains alcohol.\n"
         "- A fitting type using EXACTLY one of these values: "
         + ", ".join(drink_type_values)
         + ".\n"
         "- isFavorite should always be false.\n"
-        "- id is not relevant, so set it to '0'.\n"
-        "- imageUrl is not relevant, so set it to None.\n"
-        "- Do not make up or invent ingredients; only use the provided list (or a subset if necessary)."
+        "- id and imageUrl is not relevant, so set it to None.\n"
+        "- Do not make up or invent ingredients; only use the provided list (or a subset if necessary).\n"
+        "- Make sure the drink is balanced and pleasant—avoid combinations that are likely to be unpleasant or gross."
     ),
     output_type=DrinkAIResult,
     deps_type=None,
@@ -138,7 +141,7 @@ def add_new_drink(drink: DrinkRecipe):
 
 
 @app.patch("/drinks/{drink_id}/favorite", response_model=DrinkRecipe)
-def toggle_favorite_status(drink_id: str):
+def toggle_favorite_status(drink_id: uuid.UUID):
     for drink in drink_db:
         if drink.id == drink_id:
             drink.isFavorite = not drink.isFavorite
