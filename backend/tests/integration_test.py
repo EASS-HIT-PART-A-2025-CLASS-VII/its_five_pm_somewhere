@@ -1,5 +1,6 @@
 from unittest.mock import patch
 import uuid
+from pydantic import HttpUrl
 
 from app.models import Ingredient, DrinkRecipe, DrinkType, Unit
 from app.main import app, mixology_agent
@@ -19,7 +20,9 @@ mock_drink = DrinkRecipe(
     instructions=["Mix all ingredients", "Shake well", "Serve over ice"],
     alcoholContent=False,
     type=DrinkType.MOCKTAIL,
-    imageUrl="https://images.pexels.com/photos/11481550/pexels-photo-11481550.jpeg?auto=compress&cs=tinysrgb&h=350",
+    imageUrl=HttpUrl(
+        "https://images.pexels.com/photos/11481550/pexels-photo-11481550.jpeg?auto=compress&cs=tinysrgb&h=350"
+    ),
     isFavorite=False,
 )
 
@@ -105,7 +108,9 @@ def test_toggle_favorite_status_success():
             instructions=["Shake it well!"],
             alcoholContent=True,
             type=DrinkType.COCKTAIL,
-            imageUrl="https://images.pexels.com/photos/11481550/pexels-photo-11481550.jpeg?auto=compress&cs=tinysrgb&h=350",
+            imageUrl=HttpUrl(
+                "https://images.pexels.com/photos/11481550/pexels-photo-11481550.jpeg?auto=compress&cs=tinysrgb&h=350"
+            ),
             isFavorite=False,
         )
         drink_db.append(drink)
@@ -147,7 +152,9 @@ def test_get_random_drink_success():
             instructions=["Shake it well!"],
             alcoholContent=True,
             type=DrinkType.COCKTAIL,
-            imageUrl="https://images.pexels.com/photos/11481550/pexels-photo-11481550.jpeg?auto=compress&cs=tinysrgb&h=350",
+            imageUrl=HttpUrl(
+                "https://images.pexels.com/photos/11481550/pexels-photo-11481550.jpeg?auto=compress&cs=tinysrgb&h=350"
+            ),
             isFavorite=False,
         )
         drink_db.append(test_drink)
@@ -172,7 +179,7 @@ def test_generate_drink_success():
 
     try:
         mock_ai_result = MockResult()
-        mock_image_url = "https://images.pexels.com/photos/mock-image.jpg"
+        mock_image_url = HttpUrl("https://images.pexels.com/photos/mock-image.jpg")
 
         with patch.object(
             mixology_agent, "run_sync", return_value=mock_ai_result
@@ -187,7 +194,7 @@ def test_generate_drink_success():
             returned_drink = DrinkRecipe(**data)
 
             assert returned_drink.name == "Mocktail Delight"
-            assert str(returned_drink.imageUrl) == mock_image_url
+            assert returned_drink.imageUrl == mock_image_url
             assert len(returned_drink.ingredients) == 3
             assert any(
                 ing.name.lower() == "apple juice" for ing in returned_drink.ingredients

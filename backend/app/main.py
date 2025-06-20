@@ -134,7 +134,7 @@ def fetch_drink_images(request: ImageSearchRequest):
 
 @app.post("/drinks", response_model=DrinkRecipe)
 def add_new_drink(drink: DrinkRecipe):
-    drink.id = str(uuid.uuid4())
+    drink.id = uuid.uuid4()
     drink_db.append(drink)
     return drink
 
@@ -177,7 +177,7 @@ def generate_drink_from_ingredients(ingredients: List[str]):
         )
 
     new_drink.imageUrl = result[0]
-    new_drink.id = str(uuid.uuid4())
+    new_drink.id = uuid.uuid4()
     drink_db.append(new_drink)
 
     return new_drink
