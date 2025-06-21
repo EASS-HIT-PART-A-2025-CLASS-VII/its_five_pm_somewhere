@@ -7,5 +7,8 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',  // Expose on all network interfaces
     port: 5173,        // Ensure Vite is running on the expected port
+    watch: {
+      usePolling: true,
+    }
   }
 })

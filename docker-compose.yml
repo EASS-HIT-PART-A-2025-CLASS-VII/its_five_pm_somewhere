@@ -19,6 +19,8 @@ services:
       - VITE_REACT_APP_BACKEND_URL=http://localhost:8000
     depends_on:
       - backend
+    volumes:
+      - ./frontend/src:/app/src
 
   test:
     build:
