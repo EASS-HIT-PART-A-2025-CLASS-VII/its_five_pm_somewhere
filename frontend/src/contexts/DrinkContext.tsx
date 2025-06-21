@@ -1,7 +1,7 @@
 import { createContext, useState, ReactNode , useContext, useEffect } from 'react';
+import { DrinkRecipe } from '../client';
 import { getAllDrinks, addNewDrink, toggleFavorite, generateDrinkFromIngredients, getRandomDrink } from '../services/drinkService';
 import { fetchDrinkImages } from '../services/imageService';
-import { DrinkRecipe } from '../types/drink';
 
 // Define the context type
 interface DrinkContextType {

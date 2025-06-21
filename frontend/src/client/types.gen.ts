@@ -3,42 +3,7 @@
 /**
  * DrinkRecipe
  */
-export type DrinkRecipeInput = {
-    /**
-     * Id
-     */
-    id?: string | null;
-    /**
-     * Name
-     */
-    name: string;
-    /**
-     * Ingredients
-     */
-    ingredients: Array<Ingredient>;
-    /**
-     * Instructions
-     */
-    instructions: Array<string>;
-    /**
-     * Alcoholcontent
-     */
-    alcoholContent: boolean;
-    type: DrinkType;
-    /**
-     * Imageurl
-     */
-    imageUrl?: string | null;
-    /**
-     * Isfavorite
-     */
-    isFavorite: boolean;
-};
-
-/**
- * DrinkRecipe
- */
-export type DrinkRecipeOutput = {
+export type DrinkRecipe = {
     /**
      * Id
      */
@@ -169,13 +134,13 @@ export type ListAllDrinksDrinksGetResponses = {
      * Response List All Drinks Drinks Get
      * Successful Response
      */
-    200: Array<DrinkRecipeOutput>;
+    200: Array<DrinkRecipe>;
 };
 
 export type ListAllDrinksDrinksGetResponse = ListAllDrinksDrinksGetResponses[keyof ListAllDrinksDrinksGetResponses];
 
 export type AddNewDrinkDrinksPostData = {
-    body: DrinkRecipeInput;
+    body: DrinkRecipe;
     path?: never;
     query?: never;
     url: '/drinks';
@@ -194,7 +159,7 @@ export type AddNewDrinkDrinksPostResponses = {
     /**
      * Successful Response
      */
-    200: DrinkRecipeOutput;
+    200: DrinkRecipe;
 };
 
 export type AddNewDrinkDrinksPostResponse = AddNewDrinkDrinksPostResponses[keyof AddNewDrinkDrinksPostResponses];
@@ -250,7 +215,7 @@ export type ToggleFavoriteStatusDrinksDrinkIdFavoritePatchResponses = {
     /**
      * Successful Response
      */
-    200: DrinkRecipeOutput;
+    200: DrinkRecipe;
 };
 
 export type ToggleFavoriteStatusDrinksDrinkIdFavoritePatchResponse = ToggleFavoriteStatusDrinksDrinkIdFavoritePatchResponses[keyof ToggleFavoriteStatusDrinksDrinkIdFavoritePatchResponses];
@@ -266,7 +231,7 @@ export type GetRandomDrinkDrinksRandomGetResponses = {
     /**
      * Successful Response
      */
-    200: DrinkRecipeOutput;
+    200: DrinkRecipe;
 };
 
 export type GetRandomDrinkDrinksRandomGetResponse = GetRandomDrinkDrinksRandomGetResponses[keyof GetRandomDrinkDrinksRandomGetResponses];
@@ -294,7 +259,7 @@ export type GenerateDrinkFromIngredientsDrinksGeneratePostResponses = {
     /**
      * Successful Response
      */
-    200: DrinkRecipeOutput;
+    200: DrinkRecipe;
 };
 
 export type GenerateDrinkFromIngredientsDrinksGeneratePostResponse = GenerateDrinkFromIngredientsDrinksGeneratePostResponses[keyof GenerateDrinkFromIngredientsDrinksGeneratePostResponses];

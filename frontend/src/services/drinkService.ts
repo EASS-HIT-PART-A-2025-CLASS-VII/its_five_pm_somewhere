@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { DrinkRecipe } from '../types/drink';
+import { DrinkRecipe } from '../client';
 
 const API_URL = import.meta.env.VITE_REACT_APP_BACKEND_URL
 
