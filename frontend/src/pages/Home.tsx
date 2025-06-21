@@ -21,6 +21,8 @@ import SearchIcon from '@mui/icons-material/Search';
 import { useDrinkContext } from '../contexts/DrinkContext';
 import { useState } from 'react';
 import styled from 'styled-components';
+import { Lightbox } from '../components/Lightbox';
+import { RecipePage } from '../components/RecipePage';
 
 
 // Placeholder for the modal component that will show when "What Can I Make" is clicked.
@@ -37,11 +39,13 @@ const Home = () => {
   const [search, setSearch] = useState('');
   const [alcoholFilter, setAlcoholFilter] = useState<'all' | 'alcoholic' | 'non-alcoholic'>('all');
   const [showModal, setShowModal] = useState(false);
+  const [selectedDrinkId, setSelectedDrinkId] = useState<string | null>(null);
+  const selectedDrink = drinks.find(drink => drink.id === selectedDrinkId) ?? null;
 
   const handleOpenModal = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
-  
-  console.log('drinks',drinks)
+
+  console.log('drinks', drinks)
   // Get dynamic types from drinks
   const types = Array.from(new Set(drinks.map(d => d.type)));
 
@@ -99,8 +103,8 @@ const Home = () => {
         ))}
       </Stack>
 
-        {/* Placeholder for Modal */}
-        {showModal && (
+      {/* Placeholder for Modal */}
+      {showModal && (
         <ModalPlaceholder>
           <Typography variant="h6">Select Ingredients to Create a Drink</Typography>
           {/* Placeholder for ingredient selection UI */}
@@ -113,15 +117,25 @@ const Home = () => {
 
       <List>
         {filteredDrinks.map((drink) => (
-          <ListItem key={drink.id} sx={{ borderBottom: '1px solid #eee' }}>
+          <ListItem
+            key={drink.id}
+            sx={{ borderBottom: '1px solid #eee', cursor: 'pointer' }}
+            onClick={() => setSelectedDrinkId(drink.id!)}
+          >
             <ListItemAvatar>
-              <Avatar variant="rounded" src={drink.imageUrl} />
+              <Avatar variant="rounded" src={drink.imageUrl ?? ""} />
             </ListItemAvatar>
             <ListItemText
               primary={drink.name}
               secondary={`${drink.type} • ${drink.alcoholContent ? 'Alcoholic' : 'Non-Alcoholic'}`}
             />
-            <IconButton edge="end" onClick={() => toggleFavoriteStatus(drink.id)}>
+            <IconButton
+              edge="end"
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleFavoriteStatus(drink.id!);
+              }}
+            >
               {drink.isFavorite ? (
                 <FavoriteIcon color="error" />
               ) : (
@@ -131,6 +145,16 @@ const Home = () => {
           </ListItem>
         ))}
       </List>
+
+      {selectedDrink && (
+        <Lightbox onClose={() => setSelectedDrinkId(null)}>
+          <RecipePage
+            drink={selectedDrink}
+            toggleFavoriteStatus={toggleFavoriteStatus}
+          />
+        </Lightbox>
+      )}
+
     </Box>
   );
 };
