@@ -46,7 +46,6 @@ const Home = () => {
   const handleCloseModal = () => setShowModal(false);
 
   console.log('drinks', drinks)
-  // Get dynamic types from drinks
   const types = Array.from(new Set(drinks.map(d => d.type)));
 
   const handleAlcoholFilter = (_: any, newValue: any) => {
@@ -71,7 +70,7 @@ const Home = () => {
       <Stack direction="row" spacing={2} mb={2}>
         <TextField
           fullWidth
-          placeholder="Search drinks or ingredients..."
+          placeholder="Explore drinks by name..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           InputProps={{ endAdornment: <SearchIcon color="action" /> }}
