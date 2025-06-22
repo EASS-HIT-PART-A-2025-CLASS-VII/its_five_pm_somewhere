@@ -3,9 +3,11 @@ import { NavLink } from 'react-router-dom';
 import { AppBar, Toolbar, Typography, Box } from '@mui/material';
 import styled from 'styled-components';
 
-// Styled components
+export const APP_BAR_HEIGHT = 64;
+
 const StyledAppBar = styled(AppBar)`
   background-color: #3f51b5;
+  height: ${APP_BAR_HEIGHT}px;
 `;
 
 const Logo = styled(Typography)`

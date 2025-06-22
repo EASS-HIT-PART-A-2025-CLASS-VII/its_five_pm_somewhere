@@ -1,7 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-
-const APP_BAR_HEIGHT = 64;
+import { APP_BAR_HEIGHT } from './Header';
 
 const DimmedBackground = styled.div`
   position: fixed;
