@@ -1,17 +1,11 @@
 import axios from 'axios';
+import { ImageSearchRequest } from '../client';
 
-const API_URL = import.meta.env.VITE_REACT_APP_BACKEND_URL
+const API_URL = import.meta.env.VITE_REACT_APP_BACKEND_URL;
 
-// Fetch drink-related images from Pexels
-export const fetchDrinkImages = async (name: string, count: number = 6, page: number = 1): Promise<string[]> => {
+export const fetchDrinkImages = async (request: ImageSearchRequest): Promise<string[]> => {
   try {
-    const response = await axios.get<string[]>(`${API_URL}/drinks/images`, {
-      params: {
-        name,
-        count,
-        page,
-      },
-    });
+    const response = await axios.post<string[]>(`${API_URL}/drinks/images`, request);
     return response.data;
   } catch (error) {
     console.error('Error fetching drink images:', error);
