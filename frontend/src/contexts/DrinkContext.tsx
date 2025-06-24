@@ -29,6 +29,8 @@ export const DrinkProvider: React.FC<DrinkProviderProps> = ({ children }) => {
   const [randomDrink, setRandomDrink] = useState<DrinkRecipe | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [imageCache, setImageCache] = useState<Record<string, string[]>>({});
+
 
   useEffect(() => {
     fetchDrinks();
@@ -101,11 +103,19 @@ export const DrinkProvider: React.FC<DrinkProviderProps> = ({ children }) => {
     }
   };
 
-  // Note: This function is intended for use with components that handle their own loading and error states.
+  // Note1: This function is intended for use with components that handle their own loading and error states.
   // The consuming component should manage loading and error display locally, not via the global context.
   const fetchImages = async (query: string, page: number) => {
-    const request = { name: query, count: IMAGES_PER_PAGE, page }
-    return await fetchDrinkImages(request);
+    const cacheKey = `${query}:${page}`;
+    if (imageCache[cacheKey]) return imageCache[cacheKey];
+    try {
+      const request = { name: query, count: IMAGES_PER_PAGE, page };
+      const result = await fetchDrinkImages(request) || [];
+      setImageCache(prev => ({ ...prev, [cacheKey]: result }));
+      return result;
+    } catch (err) {
+      throw err;
+    }
   };
 
   const clearError = () => setError(null);
