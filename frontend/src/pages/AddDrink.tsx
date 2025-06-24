@@ -48,6 +48,7 @@ const IngredientStack = styled(Stack)`
   margin-bottom: 1.5rem;
 `;
 
+const getUnitLabel = (unit: Unit) => (unit === Unit.TOP_UP ? 'top up' : unit);
 
 const AddDrink: React.FC = () => {
   const { addDrink, loading, error, clearError, fetchImages } = useDrinkContext();
@@ -55,7 +56,7 @@ const AddDrink: React.FC = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const [name, setName] = useState('');
-  const [ingredients, setIngredients] = useState<Ingredient[]>([{ name: '', amount: 0, unit: Unit.PIECE }]);
+  const [ingredients, setIngredients] = useState<Ingredient[]>([{ name: '', amount: 1, unit: Unit.PIECE }]);
   const [instructions, setInstructions] = useState<string[]>(['']);
   const [alcoholContent, setAlcoholContent] = useState(false);
   const [drinkType, setDrinkType] = useState<DrinkType>(DrinkType.COCKTAIL);
@@ -63,18 +64,43 @@ const AddDrink: React.FC = () => {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [imageModalOpen, setImageModalOpen] = useState(false);
 
+  // Validation state
+  const [ingredientErrors, setIngredientErrors] = useState<{ name: boolean; amount: boolean }[]>([{ name: false, amount: false }]);
+  const [formError, setFormError] = useState<string | null>(null);
+
+  const validateIngredient = (ingredient: Ingredient) => ({
+    name: ingredient.name.trim().length < 2,
+    amount: ingredient.unit === Unit.TOP_UP ? false : ingredient.amount <= 0
+  });
+
   const handleAddIngredient = () => {
-    setIngredients([...ingredients, { name: '', amount: 0, unit: Unit.PIECE }]);
+    setIngredients([...ingredients, { name: '', amount: 1, unit: Unit.PIECE }]);
+    setIngredientErrors([...ingredientErrors, { name: false, amount: false }]);
   };
 
   const handleRemoveIngredient = (index: number) => {
     setIngredients(ingredients.filter((_, i) => i !== index));
+    setIngredientErrors(ingredientErrors.filter((_, i) => i !== index));
   };
 
   const handleIngredientChange = (index: number, field: keyof Ingredient, value: string | number | Unit) => {
     const newIngredients = [...ingredients];
-    newIngredients[index][field] = value as never;
+    if (field === 'unit') {
+      newIngredients[index].unit = value as Unit;
+      if (value === Unit.TOP_UP) {
+        newIngredients[index].amount = 1;
+      }
+    } else if (field === 'amount') {
+      newIngredients[index].amount = typeof value === 'number' ? value : parseFloat(value as string) || 1;
+    } else if (field === 'name') {
+      newIngredients[index].name = value as string;
+    }
     setIngredients(newIngredients);
+
+    const errors = validateIngredient(newIngredients[index]);
+    const newErrors = [...ingredientErrors];
+    newErrors[index] = errors;
+    setIngredientErrors(newErrors);
   };
 
   const handleAddInstruction = () => {
@@ -91,11 +117,28 @@ const AddDrink: React.FC = () => {
     setInstructions(newInstructions);
   };
 
+  const isFormValid = () => {
+    let valid = true;
+    const errors = ingredients.map(validateIngredient);
+    setIngredientErrors(errors);
+    for (const err of errors) {
+      if (err.name || err.amount) valid = false;
+    }
+    if (!name.trim()) valid = false;
+    if (!instructions[0].trim()) valid = false;
+    return valid;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFormError(null);
+    if (!isFormValid()) {
+      setFormError('Please fix ingredient errors and fill all required fields.');
+      return;
+    }
     const drink: DrinkRecipe = {
       name,
-      ingredients: ingredients.filter(i => i.name.trim() !== ''),
+      ingredients: ingredients.filter(i => i.name.trim().length >= 2),
       instructions: instructions.filter(i => i.trim() !== ''),
       alcoholContent,
       type: drinkType,
@@ -112,7 +155,7 @@ const AddDrink: React.FC = () => {
           <Typography variant="h4" gutterBottom>
             Add New Drink
           </Typography>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} noValidate>
             <Stack gap={2}>
               <TextField
                 label="Drink Name"
@@ -120,26 +163,34 @@ const AddDrink: React.FC = () => {
                 onChange={(e) => setName(e.target.value)}
                 required
                 fullWidth
+                error={!name.trim()}
+                helperText={!name.trim() ? 'Required' : ''}
               />
               <Divider />
               <Typography variant="h6">Ingredients</Typography>
               <IngredientStack>
                 {ingredients.map((ingredient, index) => (
-                  <Stack key={index} direction={isMobile ? 'column' : 'row'} gap={1} alignItems="center">
+                  <Stack key={index} direction={isMobile ? 'column' : 'row'} gap={1}>
                     <TextField
                       label="Ingredient"
                       value={ingredient.name}
                       onChange={(e) => handleIngredientChange(index, 'name', e.target.value)}
-                      required={index === 0}
+                      required
                       sx={{ flex: 2 }}
+                      error={ingredientErrors[index]?.name}
+                      helperText={ingredientErrors[index]?.name ? 'At least 2 characters' : ''}
                     />
                     <TextField
                       label="Amount"
                       type="number"
                       value={ingredient.amount}
-                      onChange={(e) => handleIngredientChange(index, 'amount', parseFloat(e.target.value) || 0)}
+                      onChange={(e) => handleIngredientChange(index, 'amount', parseFloat(e.target.value) || 1)}
                       required
                       sx={{ flex: 1 }}
+                      disabled={ingredient.unit === Unit.TOP_UP}
+                      error={ingredientErrors[index]?.amount}
+                      helperText={ingredient.unit === Unit.TOP_UP ? '' : ingredientErrors[index]?.amount ? 'Must be > 0' : ''}
+                      inputProps={{ min: 1 }}
                     />
                     <TextField
                       select
@@ -150,7 +201,7 @@ const AddDrink: React.FC = () => {
                     >
                       {Object.values(Unit).map((unit) => (
                         <MenuItem key={unit} value={unit}>
-                          {unit}
+                          {getUnitLabel(unit)}
                         </MenuItem>
                       ))}
                     </TextField>
@@ -159,6 +210,7 @@ const AddDrink: React.FC = () => {
                         variant="outlined"
                         color="error"
                         onClick={() => handleRemoveIngredient(index)}
+                        sx={{ height: 56, minWidth: 100 }}
                       >
                         Remove
                       </Button>
@@ -173,7 +225,7 @@ const AddDrink: React.FC = () => {
               <Typography variant="h6">Instructions</Typography>
               <IngredientStack>
                 {instructions.map((instruction, index) => (
-                  <Stack key={index} direction="row" gap={1} alignItems="center">
+                  <Stack key={index} direction="row" gap={1}>
                     <TextField
                       label={`Step ${index + 1}`}
                       value={instruction}
@@ -181,12 +233,15 @@ const AddDrink: React.FC = () => {
                       required={index === 0}
                       fullWidth
                       multiline
+                      error={index === 0 && !instruction.trim()}
+                      helperText={index === 0 && !instruction.trim() ? 'Required' : ''}
                     />
                     {instructions.length > 1 && (
                       <Button
                         variant="outlined"
                         color="error"
                         onClick={() => handleRemoveInstruction(index)}
+                        sx={{ height: 56, minWidth: 100 }}
                       >
                         Remove
                       </Button>
@@ -250,6 +305,11 @@ const AddDrink: React.FC = () => {
                   <Typography color="text.secondary">No image selected</Typography>
                 )}
               </Box>
+              {formError && (
+                <Typography color="error" sx={{ mt: 1 }}>
+                  {formError}
+                </Typography>
+              )}
               <Button
                 type="submit"
                 variant="contained"
