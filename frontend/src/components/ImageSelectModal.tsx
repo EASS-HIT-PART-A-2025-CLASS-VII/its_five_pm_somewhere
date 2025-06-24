@@ -1,4 +1,4 @@
-import { useState, useEffect, FC } from 'react';
+import { useState, useEffect, FC, useCallback } from 'react';
 import {
     Box,
     Button,
@@ -14,6 +14,7 @@ import styled from 'styled-components';
 import { IMAGES_PER_PAGE } from '../constants';
 
 const MAX_PAGE = 4;
+const DEBOUNCE_TIMEOUT = 500;
 
 interface ImageSelectModalProps {
     onClose: () => void;
@@ -52,14 +53,20 @@ const ImageSelectModal: FC<ImageSelectModalProps> = ({
     const [selectedImg, setSelectedImg] = useState<string | null>(null);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
 
-    const fetchAndSetImages = async () => {
-        const results = await fetchImages(query, page);
-        setImages(results || []);
-    };
-
+    // Debounced search effect
     useEffect(() => {
-        if (query) fetchAndSetImages();
-    }, [query, page]);
+        if (query.trim() === '') {
+            setImages([]);
+            return;
+        }
+        const handler = setTimeout(() => {
+            fetchImages(query, page)
+                .then(results => setImages(results || []))
+                .catch(console.error);
+        }, DEBOUNCE_TIMEOUT);
+
+        return () => clearTimeout(handler);
+    }, [query, page, fetchImages]);
 
     const handleConfirm = () => {
         if (selectedImg) {
