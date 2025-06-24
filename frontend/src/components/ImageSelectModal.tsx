@@ -8,11 +8,12 @@ import {
     Stack,
     TextField,
     Typography,
+    Snackbar,
 } from '@mui/material';
 import styled from 'styled-components';
 import { IMAGES_PER_PAGE } from '../constants';
 
-const MAX_PAGE_NUM = 4;
+const MAX_PAGE = 4;
 
 interface ImageSelectModalProps {
     onClose: () => void;
@@ -22,23 +23,22 @@ interface ImageSelectModalProps {
 }
 
 const ImageFlexContainer = styled(Box)`
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
 `;
 
 const ImageCard = styled(Box) <{ $maxPerRow: number }>`
-    flex: 1 1 calc(100% / ${(props) => props.$maxPerRow} - 1rem);
-    min-width: calc(100% / ${(props) => props.$maxPerRow} - 1rem);
-    max-width: calc(100% / ${(props) => props.$maxPerRow} - 1rem);
-    @media (max-width: 600px) {
-        flex: 1 1 calc(100% / 2 - 1rem);
-        min-width: calc(100% / 2 - 1rem);
-        max-width: calc(100% / 2 - 1rem);
-    }
+  flex: 1 1 calc(100% / ${(props) => props.$maxPerRow} - 1rem);
+  min-width: calc(100% / ${(props) => props.$maxPerRow} - 1rem);
+  max-width: calc(100% / ${(props) => props.$maxPerRow} - 1rem);
+  @media (max-width: 600px) {
+    flex: 1 1 calc(100% / 2 - 1rem);
+    min-width: calc(100% / 2 - 1rem);
+    max-width: calc(100% / 2 - 1rem);
+  }
 `;
-
 
 const ImageSelectModal: FC<ImageSelectModalProps> = ({
     onClose,
@@ -49,6 +49,8 @@ const ImageSelectModal: FC<ImageSelectModalProps> = ({
     const [query, setQuery] = useState('');
     const [images, setImages] = useState<string[]>([]);
     const [page, setPage] = useState(1);
+    const [selectedImg, setSelectedImg] = useState<string | null>(null);
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
 
     const fetchAndSetImages = async () => {
         const results = await fetchImages(query, page);
@@ -58,6 +60,15 @@ const ImageSelectModal: FC<ImageSelectModalProps> = ({
     useEffect(() => {
         if (query) fetchAndSetImages();
     }, [query, page]);
+
+    const handleConfirm = () => {
+        if (selectedImg) {
+            onSelect(selectedImg);
+            onClose();
+        } else {
+            setSnackbarOpen(true);
+        }
+    };
 
     return (
         <Paper
@@ -70,7 +81,7 @@ const ImageSelectModal: FC<ImageSelectModalProps> = ({
                 maxWidth: 800,
                 p: 4,
                 borderRadius: 4,
-                outline: 'none'
+                outline: 'none',
             }}
             elevation={24}
         >
@@ -86,7 +97,14 @@ const ImageSelectModal: FC<ImageSelectModalProps> = ({
                 <ImageFlexContainer>
                     {images.slice(0, maxPerRow).map((img) => (
                         <ImageCard key={img} $maxPerRow={maxPerRow}>
-                            <CardActionArea onClick={() => onSelect(img)}>
+                            <CardActionArea
+                                onClick={() => setSelectedImg(img)}
+                                sx={{
+                                    border: selectedImg === img ? '2px solid #1976d2' : '2px solid transparent',
+                                    borderRadius: 1,
+                                    boxShadow: selectedImg === img ? '0 0 8px rgba(25, 118, 210, 0.6)' : 'none',
+                                }}
+                            >
                                 <CardMedia
                                     component="img"
                                     image={img}
@@ -102,14 +120,20 @@ const ImageSelectModal: FC<ImageSelectModalProps> = ({
                     <Button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1}>
                         Previous
                     </Button>
-                    <Button onClick={() => setPage(p => p + 1)} disabled={page >= MAX_PAGE_NUM}>
+                    <Button onClick={() => setPage(p => p + 1)} disabled={page >= MAX_PAGE}>
                         Next
                     </Button>
                 </Stack>
-                <Button onClick={onClose} variant="outlined" fullWidth>
+                <Button onClick={handleConfirm} variant="outlined" fullWidth>
                     Confirm Selection
                 </Button>
             </Stack>
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={3000}
+                onClose={() => setSnackbarOpen(false)}
+                message="Please select an image before confirming."
+            />
         </Paper>
     );
 };
