@@ -1,13 +1,12 @@
-import { createContext, useState, ReactNode , useContext, useEffect } from 'react';
+import { createContext, useState, ReactNode, useContext, useEffect } from 'react';
 import { DrinkRecipe } from '../client';
 import { getAllDrinks, addNewDrink, toggleFavorite, generateDrinkFromIngredients, getRandomDrink } from '../services/drinkService';
 import { fetchDrinkImages } from '../services/imageService';
+import { IMAGES_PER_PAGE } from '../constants'
 
-// Define the context type
 interface DrinkContextType {
   drinks: DrinkRecipe[];
   randomDrink: DrinkRecipe | null;
-  images: string[];
   loading: boolean;
   error: string | null;
   fetchDrinks: () => void;
@@ -15,23 +14,19 @@ interface DrinkContextType {
   toggleFavoriteStatus: (drinkId: string) => void;
   generateDrink: (ingredients: string[]) => void;
   fetchRandomDrink: () => void;
-  fetchImages: (name: string) => void;
+  fetchImages: (query: string, page: number) => Promise<string[] | undefined>;
   clearError: () => void;
 }
 
-// Create the context
 const DrinkContext = createContext<DrinkContextType | undefined>(undefined);
 
-// Define the props for the provider component
 interface DrinkProviderProps {
-    children: ReactNode;  // Explicitly defining the children prop type
+  children: ReactNode;  // Explicitly defining the children prop type
 }
 
-// The provider component that supplies the context value
 export const DrinkProvider: React.FC<DrinkProviderProps> = ({ children }) => {
   const [drinks, setDrinks] = useState<DrinkRecipe[]>([]);
   const [randomDrink, setRandomDrink] = useState<DrinkRecipe | null>(null);
-  const [images, setImages] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,7 +34,6 @@ export const DrinkProvider: React.FC<DrinkProviderProps> = ({ children }) => {
     fetchDrinks();
   }, []);
 
-  // Fetch all drinks
   const fetchDrinks = async () => {
     setLoading(true);
     setError(null);
@@ -53,7 +47,6 @@ export const DrinkProvider: React.FC<DrinkProviderProps> = ({ children }) => {
     }
   };
 
-  // Add a new drink
   const addDrink = async (drink: DrinkRecipe) => {
     setLoading(true);
     setError(null);
@@ -67,7 +60,6 @@ export const DrinkProvider: React.FC<DrinkProviderProps> = ({ children }) => {
     }
   };
 
-  // Toggle favorite status of a drink
   const toggleFavoriteStatus = async (drinkId: string) => {
     setLoading(true);
     setError(null);
@@ -83,7 +75,6 @@ export const DrinkProvider: React.FC<DrinkProviderProps> = ({ children }) => {
     }
   };
 
-  // Generate a drink from ingredients
   const generateDrink = async (ingredients: string[]) => {
     setLoading(true);
     setError(null);
@@ -97,7 +88,6 @@ export const DrinkProvider: React.FC<DrinkProviderProps> = ({ children }) => {
     }
   };
 
-  // Fetch a random drink
   const fetchRandomDrink = async () => {
     setLoading(true);
     setError(null);
@@ -111,13 +101,12 @@ export const DrinkProvider: React.FC<DrinkProviderProps> = ({ children }) => {
     }
   };
 
-  // Fetch images for a drink
-  const fetchImages = async (name: string) => {
+  const fetchImages = async (query: string, page: number) => {
     setLoading(true);
     setError(null);
     try {
-      const drinkImages = await fetchDrinkImages(name);
-      setImages(drinkImages);
+      const request = { name: query, count: IMAGES_PER_PAGE, page }
+      return await fetchDrinkImages(request);
     } catch (err) {
       setError('Error fetching drink images');
     } finally {
@@ -132,7 +121,6 @@ export const DrinkProvider: React.FC<DrinkProviderProps> = ({ children }) => {
       value={{
         drinks,
         randomDrink,
-        images,
         loading,
         error,
         fetchDrinks,
@@ -149,7 +137,6 @@ export const DrinkProvider: React.FC<DrinkProviderProps> = ({ children }) => {
   );
 };
 
-// Custom hook to use the DrinkContext
 export const useDrinkContext = (): DrinkContextType => {
   const context = useContext(DrinkContext);
   if (!context) {

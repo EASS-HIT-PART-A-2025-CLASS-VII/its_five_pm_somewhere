@@ -1,8 +1,291 @@
+import React, { useState } from 'react';
+import {
+  Box,
+  Button,
+  Card,
+  CardMedia,
+  CircularProgress,
+  Container,
+  Divider,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  IconButton,
+  MenuItem,
+  Radio,
+  RadioGroup,
+  Snackbar,
+  Stack,
+  TextField,
+  Typography,
+  useMediaQuery,
+  useTheme
+} from '@mui/material';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import styled from 'styled-components';
+import { DrinkRecipe, DrinkType, Ingredient, Unit } from '../client';
+import { useDrinkContext } from '../contexts/DrinkContext';
+import ImageSelectModal from '../components/ImageSelectModal';
+import { Lightbox } from '../components/Lightbox';
 
-const AddDrink = () => {
+const AddDrinkContainer = styled(Box)`
+  padding: 2rem 1rem;
+  min-height: calc(100vh - 64px);
+  background: linear-gradient(45deg, #ff9a9e 0%, #fad0c4 99%, #f8d9e2 100%);
+`;
+
+const FormCard = styled(Card)`
+  padding: 2rem;
+  margin: 0 auto;
+  max-width: 800px;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+`;
+
+const IngredientStack = styled(Stack)`
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+`;
+
+
+const AddDrink: React.FC = () => {
+  const { addDrink, loading, error, clearError, fetchImages } = useDrinkContext();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  const [name, setName] = useState('');
+  const [ingredients, setIngredients] = useState<Ingredient[]>([{ name: '', amount: 0, unit: Unit.PIECE }]);
+  const [instructions, setInstructions] = useState<string[]>(['']);
+  const [alcoholContent, setAlcoholContent] = useState(false);
+  const [drinkType, setDrinkType] = useState<DrinkType>(DrinkType.COCKTAIL);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [imageModalOpen, setImageModalOpen] = useState(false);
+
+  const handleAddIngredient = () => {
+    setIngredients([...ingredients, { name: '', amount: 0, unit: Unit.PIECE }]);
+  };
+
+  const handleRemoveIngredient = (index: number) => {
+    setIngredients(ingredients.filter((_, i) => i !== index));
+  };
+
+  const handleIngredientChange = (index: number, field: keyof Ingredient, value: string | number | Unit) => {
+    const newIngredients = [...ingredients];
+    newIngredients[index][field] = value as never;
+    setIngredients(newIngredients);
+  };
+
+  const handleAddInstruction = () => {
+    setInstructions([...instructions, '']);
+  };
+
+  const handleRemoveInstruction = (index: number) => {
+    setInstructions(instructions.filter((_, i) => i !== index));
+  };
+
+  const handleInstructionChange = (index: number, value: string) => {
+    const newInstructions = [...instructions];
+    newInstructions[index] = value;
+    setInstructions(newInstructions);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const drink: DrinkRecipe = {
+      name,
+      ingredients: ingredients.filter(i => i.name.trim() !== ''),
+      instructions: instructions.filter(i => i.trim() !== ''),
+      alcoholContent,
+      type: drinkType,
+      imageUrl: imageUrl || null,
+      isFavorite
+    };
+    await addDrink(drink);
+  };
+
   return (
-    <div>AddDrink</div>
-  )
-}
+    <AddDrinkContainer>
+      <Container maxWidth="md">
+        <FormCard>
+          <Typography variant="h4" gutterBottom>
+            Add New Drink
+          </Typography>
+          <form onSubmit={handleSubmit}>
+            <Stack gap={2}>
+              <TextField
+                label="Drink Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                fullWidth
+              />
+              <Divider />
+              <Typography variant="h6">Ingredients</Typography>
+              <IngredientStack>
+                {ingredients.map((ingredient, index) => (
+                  <Stack key={index} direction={isMobile ? 'column' : 'row'} gap={1} alignItems="center">
+                    <TextField
+                      label="Ingredient"
+                      value={ingredient.name}
+                      onChange={(e) => handleIngredientChange(index, 'name', e.target.value)}
+                      required={index === 0}
+                      sx={{ flex: 2 }}
+                    />
+                    <TextField
+                      label="Amount"
+                      type="number"
+                      value={ingredient.amount}
+                      onChange={(e) => handleIngredientChange(index, 'amount', parseFloat(e.target.value) || 0)}
+                      required
+                      sx={{ flex: 1 }}
+                    />
+                    <TextField
+                      select
+                      label="Unit"
+                      value={ingredient.unit}
+                      onChange={(e) => handleIngredientChange(index, 'unit', e.target.value as Unit)}
+                      sx={{ flex: 1 }}
+                    >
+                      {Object.values(Unit).map((unit) => (
+                        <MenuItem key={unit} value={unit}>
+                          {unit}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                    {ingredients.length > 1 && (
+                      <Button
+                        variant="outlined"
+                        color="error"
+                        onClick={() => handleRemoveIngredient(index)}
+                      >
+                        Remove
+                      </Button>
+                    )}
+                  </Stack>
+                ))}
+                <Button variant="outlined" onClick={handleAddIngredient}>
+                  Add Ingredient
+                </Button>
+              </IngredientStack>
+              <Divider />
+              <Typography variant="h6">Instructions</Typography>
+              <IngredientStack>
+                {instructions.map((instruction, index) => (
+                  <Stack key={index} direction="row" gap={1} alignItems="center">
+                    <TextField
+                      label={`Step ${index + 1}`}
+                      value={instruction}
+                      onChange={(e) => handleInstructionChange(index, e.target.value)}
+                      required={index === 0}
+                      fullWidth
+                      multiline
+                    />
+                    {instructions.length > 1 && (
+                      <Button
+                        variant="outlined"
+                        color="error"
+                        onClick={() => handleRemoveInstruction(index)}
+                      >
+                        Remove
+                      </Button>
+                    )}
+                  </Stack>
+                ))}
+                <Button variant="outlined" onClick={handleAddInstruction}>
+                  Add Step
+                </Button>
+              </IngredientStack>
+              <Divider />
+              <FormControl component="fieldset">
+                <FormLabel component="legend">Alcohol Content</FormLabel>
+                <RadioGroup
+                  row
+                  value={alcoholContent}
+                  onChange={(e) => setAlcoholContent(e.target.value === 'true')}
+                >
+                  <FormControlLabel value={true} control={<Radio />} label="Alcoholic" />
+                  <FormControlLabel value={false} control={<Radio />} label="Non-Alcoholic" />
+                </RadioGroup>
+              </FormControl>
+              <FormControl component="fieldset">
+                <FormLabel component="legend">Drink Type</FormLabel>
+                <RadioGroup
+                  row
+                  value={drinkType}
+                  onChange={(e) => setDrinkType(e.target.value as DrinkType)}
+                >
+                  {Object.values(DrinkType).map((type) => (
+                    <FormControlLabel
+                      key={type}
+                      value={type}
+                      control={<Radio />}
+                      label={type}
+                    />
+                  ))}
+                </RadioGroup>
+              </FormControl>
+              <Divider />
+              <Stack direction="row" alignItems="center" gap={1}>
+                <Typography>Favorite</Typography>
+                <IconButton onClick={() => setIsFavorite(!isFavorite)}>
+                  {isFavorite ? <FavoriteIcon color="error" /> : <FavoriteBorderIcon />}
+                </IconButton>
+              </Stack>
+              <Divider />
+              <Typography variant="h6">Drink Image</Typography>
+              <Box display="flex" flexDirection="column" gap={2}>
+                <Button variant="outlined" onClick={() => setImageModalOpen(true)}>
+                  Choose Image
+                </Button>
+                {imageUrl ? (
+                  <CardMedia
+                    component="img"
+                    image={imageUrl}
+                    alt="Selected drink"
+                    sx={{ height: 200, objectFit: 'cover', borderRadius: 2 }}
+                  />
+                ) : (
+                  <Typography color="text.secondary">No image selected</Typography>
+                )}
+              </Box>
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                size="large"
+                disabled={loading}
+                sx={{ mt: 3 }}
+              >
+                {loading ? <CircularProgress size={24} /> : 'Save Recipe'}
+              </Button>
+            </Stack>
+          </form>
+        </FormCard>
+      </Container>
+      {imageModalOpen && (
+        <Lightbox onClose={() => setImageModalOpen(false)}>
+          <ImageSelectModal
+            onClose={() => setImageModalOpen(false)}
+            onSelect={setImageUrl}
+            fetchImages={fetchImages}
+          />
+        </Lightbox>
+      )}
+      <Snackbar
+        open={!!error}
+        autoHideDuration={6000}
+        onClose={clearError}
+        message={error}
+        action={
+          <Button color="inherit" size="small" onClick={clearError}>
+            Close
+          </Button>
+        }
+      />
+    </AddDrinkContainer>
+  );
+};
 
-export default AddDrink
+export default AddDrink;
