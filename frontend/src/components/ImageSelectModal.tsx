@@ -1,4 +1,4 @@
-import { useState, useEffect, FC, useCallback } from 'react';
+import { useState, useEffect, FC } from 'react';
 import {
     Box,
     Button,
@@ -9,6 +9,8 @@ import {
     TextField,
     Typography,
     Snackbar,
+    CircularProgress,
+    Alert,
 } from '@mui/material';
 import styled from 'styled-components';
 import { IMAGES_PER_PAGE } from '../constants';
@@ -52,6 +54,8 @@ const ImageSelectModal: FC<ImageSelectModalProps> = ({
     const [page, setPage] = useState(1);
     const [selectedImg, setSelectedImg] = useState<string | null>(null);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     // Debounced search effect
     useEffect(() => {
@@ -59,10 +63,18 @@ const ImageSelectModal: FC<ImageSelectModalProps> = ({
             setImages([]);
             return;
         }
-        const handler = setTimeout(() => {
-            fetchImages(query, page)
-                .then(results => setImages(results || []))
-                .catch(console.error);
+        const handler = setTimeout(async () => {
+            setLoading(true);
+            setError(null);
+            try {
+                const results = await fetchImages(query, page);
+                setImages(results || []);
+            } catch (err) {
+                setError('Looks like our image mixer is out of juice. Try searching again!');
+                setImages([]);
+            } finally {
+                setLoading(false);
+            }
         }, DEBOUNCE_TIMEOUT);
 
         return () => clearTimeout(handler);
@@ -101,6 +113,16 @@ const ImageSelectModal: FC<ImageSelectModalProps> = ({
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="e.g. cocktail, smoothie"
                 />
+                {loading && (
+                    <Box display="flex" justifyContent="center" py={2}>
+                        <CircularProgress />
+                    </Box>
+                )}
+                {error && (
+                    <Alert severity="error" sx={{ mb: 2 }}>
+                        {error}
+                    </Alert>
+                )}
                 <ImageFlexContainer>
                     {images.slice(0, maxPerRow).map((img) => (
                         <ImageCard key={img} $maxPerRow={maxPerRow}>
@@ -122,7 +144,6 @@ const ImageSelectModal: FC<ImageSelectModalProps> = ({
                         </ImageCard>
                     ))}
                 </ImageFlexContainer>
-
                 <Stack direction="row" justifyContent="space-between" mt={2}>
                     <Button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1}>
                         Previous

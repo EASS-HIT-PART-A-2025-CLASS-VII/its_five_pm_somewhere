@@ -101,17 +101,11 @@ export const DrinkProvider: React.FC<DrinkProviderProps> = ({ children }) => {
     }
   };
 
+  // Note: This function is intended for use with components that handle their own loading and error states.
+  // The consuming component should manage loading and error display locally, not via the global context.
   const fetchImages = async (query: string, page: number) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const request = { name: query, count: IMAGES_PER_PAGE, page }
-      return await fetchDrinkImages(request);
-    } catch (err) {
-      setError('Error fetching drink images');
-    } finally {
-      setLoading(false);
-    }
+    const request = { name: query, count: IMAGES_PER_PAGE, page }
+    return await fetchDrinkImages(request);
   };
 
   const clearError = () => setError(null);
