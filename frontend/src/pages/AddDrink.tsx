@@ -291,20 +291,32 @@ const AddDrink: React.FC = () => {
               <Divider />
               <Typography variant="h6">Drink Image</Typography>
               <Box display="flex" flexDirection="column" gap={2}>
-                <Button variant="outlined" onClick={() => setImageModalOpen(true)}>
-                  Choose Image
-                </Button>
+                <Stack direction="row" gap={1}>
+                  <Button variant="outlined" onClick={() => setImageModalOpen(true)}>
+                    Choose Image
+                  </Button>
+                  {imageUrl && (
+                    <Button
+                      variant="text"
+                      color="error"
+                      onClick={() => setImageUrl(null)}
+                    >
+                      Remove Image
+                    </Button>
+                  )}
+                </Stack>
                 {imageUrl ? (
                   <CardMedia
                     component="img"
                     image={imageUrl}
                     alt="Selected drink"
-                    sx={{ height: 200, objectFit: 'cover', borderRadius: 2 }}
+                    sx={{ height: 200, objectFit: 'cover', borderRadius: 2, maxWidth: 400 }}
                   />
                 ) : (
                   <Typography color="text.secondary">No image selected</Typography>
                 )}
               </Box>
+
               {formError && (
                 <Typography color="error" sx={{ mt: 1 }}>
                   {formError}
