@@ -5,7 +5,6 @@ import {
   Button,
   ToggleButton,
   ToggleButtonGroup,
-  List,
   ListItem,
   ListItemAvatar,
   Avatar,
@@ -22,6 +21,7 @@ import { useDrinkContext } from '../contexts/DrinkContext';
 import { useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+import { MAX_WIDTH_PAGE } from '../constants';
 
 const ModalPlaceholder = styled(Box)`
   padding: 20px;
@@ -30,13 +30,42 @@ const ModalPlaceholder = styled(Box)`
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 `;
 
+
+const DrinkCard = styled(ListItem)`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 12px;
+  min-width: 180px;
+  max-width: 220px;
+  height: 240px;
+  box-sizing: border-box;
+  &:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+  @media (max-width: 600px) {
+    flex-direction: row;
+    width: 100%;
+    height: auto;
+    min-width: auto;
+    max-width: none;
+    margin-bottom: 8px;
+  }
+`;
+
 const Home = () => {
+  const navigate = useNavigate();
   const { drinks, fetchRandomDrink, toggleFavoriteStatus } = useDrinkContext();
   const [search, setSearch] = useState('');
   const [alcoholFilter, setAlcoholFilter] = useState<'all' | 'alcoholic' | 'non-alcoholic'>('all');
   const [showModal, setShowModal] = useState(false);
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const types = Array.from(new Set(drinks.map(d => d.type)));
-  const navigate = useNavigate();
 
   const handleOpenModal = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
@@ -45,17 +74,26 @@ const Home = () => {
     if (newValue) setAlcoholFilter(newValue);
   };
 
+  const handleTypeClick = (type: string) => {
+    setSelectedTypes(prev =>
+      prev.includes(type)
+        ? prev.filter(t => t !== type)
+        : [...prev, type]
+    );
+  };
+
   const filteredDrinks = drinks.filter(drink => {
     const matchesSearch = drink.name.toLowerCase().includes(search.toLowerCase());
     const matchesAlcohol =
       alcoholFilter === 'all' ||
       (alcoholFilter === 'alcoholic' && drink.alcoholContent) ||
       (alcoholFilter === 'non-alcoholic' && !drink.alcoholContent);
-    return matchesSearch && matchesAlcohol;
+    const matchesTypes = selectedTypes.length === 0 || selectedTypes.includes(drink.type);
+    return matchesSearch && matchesAlcohol && matchesTypes;
   });
 
   return (
-    <Box p={3} maxWidth="800px" margin="auto">
+    <Box p={3} maxWidth={MAX_WIDTH_PAGE + "px"} margin="auto">
       <Typography variant="h4" fontWeight={600} gutterBottom>
         Discover Drinks 🍹
       </Typography>
@@ -91,9 +129,17 @@ const Home = () => {
 
       <Stack direction="row" spacing={1} flexWrap="wrap" mb={2}>
         {types.map((type) => (
-          <Chip key={type} label={type} variant="outlined" />
+          <Chip
+            key={type}
+            label={type}
+            variant={selectedTypes.includes(type) ? "filled" : "outlined"}
+            color={selectedTypes.includes(type) ? "primary" : "default"}
+            onClick={() => handleTypeClick(type)}
+            sx={{ cursor: 'pointer' }}
+          />
         ))}
       </Stack>
+
 
       {showModal && (
         <ModalPlaceholder>
@@ -106,22 +152,25 @@ const Home = () => {
         </ModalPlaceholder>
       )}
 
-      <List>
+      <Box display="flex" flexWrap="wrap" gap={2} justifyContent="center">
         {filteredDrinks.map((drink) => (
-          <ListItem
+          <DrinkCard
             key={drink.id}
-            sx={{ borderBottom: '1px solid #eee', cursor: 'pointer' }}
             onClick={() => navigate(`/recipe/${drink.id}`)}
           >
             <ListItemAvatar>
-              <Avatar variant="rounded" src={drink.imageUrl ?? undefined} />
+              <Avatar
+                variant="rounded"
+                src={drink.imageUrl ?? undefined}
+                sx={{ width: 80, height: 80, mb: 1 }}
+              />
             </ListItemAvatar>
             <ListItemText
               primary={drink.name}
               secondary={`${drink.type} • ${drink.alcoholContent ? 'Alcoholic' : 'Non-Alcoholic'}`}
+              sx={{ textAlign: 'center' }}
             />
             <IconButton
-              edge="end"
               onClick={(e) => {
                 e.stopPropagation();
                 toggleFavoriteStatus(drink.id!);
@@ -133,9 +182,10 @@ const Home = () => {
                 <FavoriteBorderIcon />
               )}
             </IconButton>
-          </ListItem>
+          </DrinkCard>
         ))}
-      </List>
+      </Box>
+
     </Box>
   );
 };
