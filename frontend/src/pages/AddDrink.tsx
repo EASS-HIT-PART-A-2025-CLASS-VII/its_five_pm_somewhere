@@ -33,7 +33,7 @@ import { useNavigate } from 'react-router-dom';
 const AddDrinkContainer = styled(Box)`
   padding: 2rem 1rem;
   min-height: calc(100vh - 64px);
-  background: linear-gradient(45deg, #ff9a9e 0%, #fad0c4 99%, #f8d9e2 100%);
+  background: linear-gradient(45deg, #543bff 0%, #5e6eff 99%, #008fff 100%);
 `;
 
 const FormCard = styled(Card)`
