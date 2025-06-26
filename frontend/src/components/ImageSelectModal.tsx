@@ -57,7 +57,10 @@ const ImageSelectModal: FC<ImageSelectModalProps> = ({
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    // Debounced search effect
+    useEffect(() => {
+        setPage(1);
+    }, [query]);
+
     useEffect(() => {
         if (query.trim() === '') {
             setImages([]);
@@ -123,35 +126,54 @@ const ImageSelectModal: FC<ImageSelectModalProps> = ({
                         {error}
                     </Alert>
                 )}
-                <ImageFlexContainer>
-                    {images.slice(0, maxPerRow).map((img) => (
-                        <ImageCard key={img} $maxPerRow={maxPerRow}>
-                            <CardActionArea
-                                onClick={() => setSelectedImg(img)}
-                                sx={{
-                                    border: selectedImg === img ? '2px solid #1976d2' : '2px solid transparent',
-                                    borderRadius: 1,
-                                    boxShadow: selectedImg === img ? '0 0 8px rgba(25, 118, 210, 0.6)' : 'none',
-                                }}
-                            >
-                                <CardMedia
-                                    component="img"
-                                    image={img}
-                                    alt={`Drink image: ${query}`}
-                                    sx={{ height: 140, objectFit: 'cover', borderRadius: 1 }}
-                                />
-                            </CardActionArea>
-                        </ImageCard>
-                    ))}
-                </ImageFlexContainer>
-                <Stack direction="row" justifyContent="space-between" mt={2}>
-                    <Button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1}>
+                {!loading && !error && (
+                    <ImageFlexContainer>
+                        {images.slice(0, maxPerRow).map((img) => (
+                            <ImageCard key={img} $maxPerRow={maxPerRow}>
+                                <CardActionArea
+                                    onClick={() => setSelectedImg(img)}
+                                    sx={{
+                                        border: selectedImg === img ? '2px solid #1976d2' : '2px solid transparent',
+                                        borderRadius: 1,
+                                        boxShadow: selectedImg === img ? '0 0 8px rgba(25, 118, 210, 0.6)' : 'none',
+                                    }}
+                                >
+                                    <CardMedia
+                                        component="img"
+                                        image={img}
+                                        alt={`Drink image: ${query}`}
+                                        sx={{ height: 140, objectFit: 'cover', borderRadius: 1 }}
+                                    />
+                                </CardActionArea>
+                            </ImageCard>
+                        ))}
+                    </ImageFlexContainer>
+                )}
+                <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    mt={2}
+                >
+                    <Button
+                        onClick={() => setPage(p => Math.max(1, p - 1))}
+                        disabled={page <= 1}
+                        sx={{ flex: 1, maxWidth: 100 }}
+                    >
                         Previous
                     </Button>
-                    <Button onClick={() => setPage(p => p + 1)} disabled={page >= MAX_PAGE}>
+                    <Typography variant="body1" sx={{ mx: 2 }}>
+                        Page {page} of {MAX_PAGE}
+                    </Typography>
+                    <Button
+                        onClick={() => setPage(p => p + 1)}
+                        disabled={page >= MAX_PAGE}
+                        sx={{ flex: 1, maxWidth: 100 }}
+                    >
                         Next
                     </Button>
-                </Stack>
+                </Box>
+
                 <Button onClick={handleConfirm} variant="outlined" fullWidth>
                     Confirm Selection
                 </Button>
