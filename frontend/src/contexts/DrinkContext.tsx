@@ -16,6 +16,7 @@ interface DrinkContextType {
   fetchRandomDrink: () => void;
   fetchImages: (query: string, page: number) => Promise<string[] | undefined>;
   clearError: () => void;
+  getDrinkById: (id: string) => DrinkRecipe | undefined;
 }
 
 const DrinkContext = createContext<DrinkContextType | undefined>(undefined);
@@ -120,6 +121,11 @@ export const DrinkProvider: React.FC<DrinkProviderProps> = ({ children }) => {
 
   const clearError = () => setError(null);
 
+  const getDrinkById = (id: string): DrinkRecipe | undefined => {
+    return drinks.find(drink => drink.id === id);
+  };
+
+
   return (
     <DrinkContext.Provider
       value={{
@@ -133,7 +139,8 @@ export const DrinkProvider: React.FC<DrinkProviderProps> = ({ children }) => {
         generateDrink,
         fetchRandomDrink,
         fetchImages,
-        clearError
+        clearError,
+        getDrinkById
       }}
     >
       {children}
