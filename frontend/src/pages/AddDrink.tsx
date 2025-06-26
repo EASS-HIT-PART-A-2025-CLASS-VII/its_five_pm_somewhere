@@ -8,14 +8,13 @@ import {
   Container,
   Divider,
   FormControl,
-  FormControlLabel,
   FormLabel,
   IconButton,
   MenuItem,
-  Radio,
-  RadioGroup,
+  Select,
   Snackbar,
   Stack,
+  Switch,
   TextField,
   Typography,
   useMediaQuery,
@@ -66,7 +65,6 @@ const AddDrink = () => {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [imageModalOpen, setImageModalOpen] = useState(false);
 
-  // Validation state
   const [ingredientErrors, setIngredientErrors] = useState<{ name: boolean; amount: boolean }[]>([{ name: false, amount: false }]);
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -209,14 +207,25 @@ const AddDrink = () => {
                       ))}
                     </TextField>
                     {ingredients.length > 1 && (
-                      <Button
-                        variant="outlined"
-                        color="error"
-                        onClick={() => handleRemoveIngredient(index)}
-                        sx={{ height: 56, minWidth: 100 }}
-                      >
-                        Remove
-                      </Button>
+                      isMobile ? (
+                        <Button
+                          variant="outlined"
+                          color="error"
+                          onClick={() => handleRemoveIngredient(index)}
+                          sx={{ mt: 1, width: '100%' }}
+                        >
+                          Remove
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="outlined"
+                          color="error"
+                          onClick={() => handleRemoveIngredient(index)}
+                          sx={{ height: 56, minWidth: 100 }}
+                        >
+                          Remove
+                        </Button>
+                      )
                     )}
                   </Stack>
                 ))}
@@ -228,7 +237,12 @@ const AddDrink = () => {
               <Typography variant="h6">Instructions</Typography>
               <IngredientStack>
                 {instructions.map((instruction, index) => (
-                  <Stack key={index} direction="row" gap={1}>
+                  <Stack
+                    key={index}
+                    direction={isMobile ? 'column' : 'row'}
+                    gap={1}
+                    alignItems={isMobile ? 'stretch' : 'center'}
+                  >
                     <TextField
                       label={`Step ${index + 1}`}
                       value={instruction}
@@ -238,16 +252,28 @@ const AddDrink = () => {
                       multiline
                       error={index === 0 && !instruction.trim()}
                       helperText={index === 0 && !instruction.trim() ? 'Required' : ''}
+                      sx={{ flex: 1 }}
                     />
                     {instructions.length > 1 && (
-                      <Button
-                        variant="outlined"
-                        color="error"
-                        onClick={() => handleRemoveInstruction(index)}
-                        sx={{ height: 56, minWidth: 100 }}
-                      >
-                        Remove
-                      </Button>
+                      isMobile ? (
+                        <Button
+                          variant="outlined"
+                          color="error"
+                          onClick={() => handleRemoveInstruction(index)}
+                          sx={{ mt: 1, width: '100%' }}
+                        >
+                          Remove
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="outlined"
+                          color="error"
+                          onClick={() => handleRemoveInstruction(index)}
+                          sx={{ height: 56, minWidth: 100 }}
+                        >
+                          Remove
+                        </Button>
+                      )
                     )}
                   </Stack>
                 ))}
@@ -255,34 +281,41 @@ const AddDrink = () => {
                   Add Step
                 </Button>
               </IngredientStack>
+
               <Divider />
-              <FormControl component="fieldset">
-                <FormLabel component="legend">Alcohol Content</FormLabel>
-                <RadioGroup
-                  row
-                  value={alcoholContent}
-                  onChange={(e) => setAlcoholContent(e.target.value === 'true')}
-                >
-                  <FormControlLabel value={true} control={<Radio />} label="Alcoholic" />
-                  <FormControlLabel value={false} control={<Radio />} label="Non-Alcoholic" />
-                </RadioGroup>
+              <FormControl component="fieldset" sx={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
+                <FormLabel component="legend" sx={{ mr: 2 }}>
+                  Alcohol Content
+                </FormLabel>
+                <Stack direction="row" alignItems="center" gap={1}>
+                  <Typography>Non-Alcoholic</Typography>
+                  <Switch
+                    checked={alcoholContent}
+                    onChange={(e) => setAlcoholContent(e.target.checked)}
+                    color="secondary"
+                    inputProps={{ 'aria-label': 'Alcoholic Switch' }}
+                  />
+                  <Typography>Alcoholic</Typography>
+                </Stack>
               </FormControl>
-              <FormControl component="fieldset">
-                <FormLabel component="legend">Drink Type</FormLabel>
-                <RadioGroup
-                  row
+              <FormControl fullWidth>
+                <FormLabel sx={{ mb: 1 }}>Drink Type</FormLabel>
+                <Select
                   value={drinkType}
                   onChange={(e) => setDrinkType(e.target.value as DrinkType)}
+                  variant="outlined"
+                  sx={{
+                    background: '#fff',
+                    borderRadius: 2,
+                    fontWeight: 500,
+                  }}
                 >
                   {Object.values(DrinkType).map((type) => (
-                    <FormControlLabel
-                      key={type}
-                      value={type}
-                      control={<Radio />}
-                      label={type}
-                    />
+                    <MenuItem key={type} value={type}>
+                      {type.charAt(0).toUpperCase() + type.slice(1)}
+                    </MenuItem>
                   ))}
-                </RadioGroup>
+                </Select>
               </FormControl>
               <Divider />
               <Stack direction="row" alignItems="center" gap={1}>
@@ -319,7 +352,6 @@ const AddDrink = () => {
                   <Typography color="text.secondary">No image selected</Typography>
                 )}
               </Box>
-
               {formError && (
                 <Typography color="error" sx={{ mt: 1 }}>
                   {formError}
