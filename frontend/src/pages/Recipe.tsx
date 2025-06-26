@@ -78,7 +78,7 @@ export const Recipe = () => {
       </Box>
 
       <img
-        src={drink.imageUrl ?? ""}
+        src={drink.imageUrl ?? undefined}
         alt={drink.name}
         style={{
           width: '100%',

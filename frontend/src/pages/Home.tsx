@@ -114,7 +114,7 @@ const Home = () => {
             onClick={() => navigate(`/recipe/${drink.id}`)}
           >
             <ListItemAvatar>
-              <Avatar variant="rounded" src={drink.imageUrl ?? ""} />
+              <Avatar variant="rounded" src={drink.imageUrl ?? undefined} />
             </ListItemAvatar>
             <ListItemText
               primary={drink.name}
