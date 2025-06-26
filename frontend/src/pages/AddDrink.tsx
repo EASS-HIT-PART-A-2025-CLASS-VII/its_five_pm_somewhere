@@ -153,7 +153,7 @@ const AddDrink = () => {
 
   return (
     <AddDrinkContainer>
-      <Container maxWidth="md">
+      <Container >
         <FormCard>
           <Typography variant="h4" gutterBottom>
             Add New Drink
