@@ -28,17 +28,18 @@ import { useDrinkContext } from '../contexts/DrinkContext';
 import ImageSelectModal from '../components/ImageSelectModal';
 import { Lightbox } from '../components/Lightbox';
 import { useNavigate } from 'react-router-dom';
+import { MAX_WIDTH_PAGE } from '../constants';
 
 const AddDrinkContainer = styled(Box)`
   padding: 2rem 1rem;
   min-height: calc(100vh - 64px);
   background: linear-gradient(45deg, #543bff 0%, #5e6eff 99%, #008fff 100%);
+  max-width: ${MAX_WIDTH_PAGE}px;
 `;
 
 const FormCard = styled(Card)`
   padding: 2rem;
   margin: 0 auto;
-  max-width: 800px;
   border-radius: 16px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 `;

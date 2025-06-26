@@ -20,7 +20,6 @@ const Layout = styled.div`
 
 const MainContent = styled.main`
   flex-grow: 1;
-  padding: 20px;
   margin-top: ${APP_BAR_HEIGHT}px;
   min-height: calc(100vh - ${APP_BAR_HEIGHT}px);
 `;
