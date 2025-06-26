@@ -1,6 +1,6 @@
 import { DrinkProvider } from './contexts/DrinkContext';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Header from './components/Header'
+import Header, { APP_BAR_HEIGHT } from './components/Header'
 import Home from './pages/Home';
 import Profile from './pages/Profile';
 import AddDrink from './pages/AddDrink';
@@ -11,7 +11,7 @@ import { Container } from '@mui/material';
 import styled from 'styled-components';
 import GlobalStyles from './styles/globalStyles';
 
-// Styled components for layout
+
 const Layout = styled.div`
   display: flex;
   flex-direction: column;
@@ -22,6 +22,8 @@ const MainContent = styled.main`
   flex-grow: 1;
   padding: 20px;
   background-color: #fff;
+  margin-top: ${APP_BAR_HEIGHT}px;
+  min-height: calc(100vh - ${APP_BAR_HEIGHT}px);
 `;
 
 const App: React.FC = () => {

@@ -8,6 +8,9 @@ export const APP_BAR_HEIGHT = 64;
 const StyledAppBar = styled(AppBar)`
   background-color: #3f51b5;
   height: ${APP_BAR_HEIGHT}px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 `;
 
 const Logo = styled(Typography)`
@@ -26,11 +29,9 @@ const StyledNavLink = styled(NavLink)`
   text-decoration: none;
   font-size: 1rem;
 
-  /* Active Link Style */
   &.active {
     border-bottom: 2px solid white;
   }
-
   &:hover {
     opacity: 0.8;
   }
@@ -38,7 +39,7 @@ const StyledNavLink = styled(NavLink)`
 
 const Header: React.FC = () => {
   return (
-    <StyledAppBar position="sticky">
+    <StyledAppBar>
       <Toolbar sx={{ gap: '20px' }}>
         <Logo variant="h6">🍸 MixMaster</Logo>
         <StyledNav>
