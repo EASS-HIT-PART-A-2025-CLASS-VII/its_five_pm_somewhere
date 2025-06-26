@@ -13,7 +13,7 @@ interface DrinkContextType {
   toggleFavoriteStatus: (drinkId: string) => void;
   generateDrink: (ingredients: string[]) => Promise<DrinkRecipe>;
   fetchRandomDrink: () => Promise<DrinkRecipe>;
-  fetchImages: (query: string, page: number) => Promise<string[] | undefined>;
+  fetchImages: (query: string, page: number) => Promise<number[] | undefined>;
   clearError: () => void;
   getDrinkById: (id: string) => DrinkRecipe | undefined;
 }
@@ -28,7 +28,7 @@ export const DrinkProvider: React.FC<DrinkProviderProps> = ({ children }) => {
   const [drinks, setDrinks] = useState<DrinkRecipe[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [imageCache, setImageCache] = useState<Record<string, string[]>>({});
+  const [imageIdCache, setImageIdCache] = useState<Record<string, number[]>>({});
 
 
   useEffect(() => {
@@ -108,15 +108,15 @@ export const DrinkProvider: React.FC<DrinkProviderProps> = ({ children }) => {
     }
   };
 
-  // Note1: This function is intended for use with components that handle their own loading and error states.
+  // This function is intended for use with components that handle their own loading and error states.
   // The consuming component should manage loading and error display locally, not via the global context.
   const fetchImages = async (query: string, page: number) => {
     const cacheKey = `${query}:${page}`;
-    if (imageCache[cacheKey]) return imageCache[cacheKey];
+    if (imageIdCache[cacheKey]) return imageIdCache[cacheKey];
     try {
       const request = { name: query, count: IMAGES_PER_PAGE, page };
       const result = await fetchDrinkImages(request) || [];
-      setImageCache(prev => ({ ...prev, [cacheKey]: result }));
+      setImageIdCache(prev => ({ ...prev, [cacheKey]: result }));
       return result;
     } catch (err) {
       throw err;

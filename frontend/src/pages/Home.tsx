@@ -23,6 +23,7 @@ import { useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { MAX_WIDTH_PAGE } from '../constants';
+import { getPexelsImageUrl } from '../utils/imageService';
 
 const ModalPlaceholder = styled(Box)`
   padding: 20px;
@@ -169,7 +170,7 @@ const Home = () => {
             <ListItemAvatar>
               <Avatar
                 variant="rounded"
-                src={drink.imageUrl ?? undefined}
+                src={getPexelsImageUrl(drink.imageId)}
                 sx={{ width: 80, height: 80, mb: 1 }}
               />
             </ListItemAvatar>

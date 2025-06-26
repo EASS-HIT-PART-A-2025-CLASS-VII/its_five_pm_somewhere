@@ -14,14 +14,15 @@ import {
 } from '@mui/material';
 import styled from 'styled-components';
 import { IMAGES_PER_PAGE } from '../constants';
+import { getPexelsImageUrl } from '../utils/imageService';
 
 const MAX_PAGE = 4;
 const DEBOUNCE_TIMEOUT = 500;
 
 interface ImageSelectModalProps {
     onClose: () => void;
-    onSelect: (src: string) => void;
-    fetchImages: (query: string, page: number) => Promise<string[] | undefined>;
+    onSelect: (src: number) => void;
+    fetchImages: (query: string, page: number) => Promise<number[] | undefined>;
     maxPerRow?: number;
 }
 
@@ -50,9 +51,9 @@ const ImageSelectModal: FC<ImageSelectModalProps> = ({
     maxPerRow = IMAGES_PER_PAGE,
 }) => {
     const [query, setQuery] = useState('');
-    const [images, setImages] = useState<string[]>([]);
+    const [imagesIds, setImagesIds] = useState<number[]>([]);
     const [page, setPage] = useState(1);
-    const [selectedImg, setSelectedImg] = useState<string | null>(null);
+    const [selectedImgId, setSelectedImgId] = useState<number | null>(null);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -63,7 +64,7 @@ const ImageSelectModal: FC<ImageSelectModalProps> = ({
 
     useEffect(() => {
         if (query.trim() === '') {
-            setImages([]);
+            setImagesIds([]);
             return;
         }
         const handler = setTimeout(async () => {
@@ -71,10 +72,10 @@ const ImageSelectModal: FC<ImageSelectModalProps> = ({
             setError(null);
             try {
                 const results = await fetchImages(query, page);
-                setImages(results || []);
+                setImagesIds(results || []);
             } catch (err) {
                 setError('Looks like our image mixer is out of juice. Try searching again!');
-                setImages([]);
+                setImagesIds([]);
             } finally {
                 setLoading(false);
             }
@@ -84,8 +85,8 @@ const ImageSelectModal: FC<ImageSelectModalProps> = ({
     }, [query, page, fetchImages]);
 
     const handleConfirm = () => {
-        if (selectedImg) {
-            onSelect(selectedImg);
+        if (selectedImgId) {
+            onSelect(selectedImgId);
             onClose();
         } else {
             setSnackbarOpen(true);
@@ -128,19 +129,19 @@ const ImageSelectModal: FC<ImageSelectModalProps> = ({
                 )}
                 {!loading && !error && (
                     <ImageFlexContainer>
-                        {images.slice(0, maxPerRow).map((img) => (
-                            <ImageCard key={img} $maxPerRow={maxPerRow}>
+                        {imagesIds.slice(0, maxPerRow).map((imgId) => (
+                            <ImageCard key={imgId} $maxPerRow={maxPerRow}>
                                 <CardActionArea
-                                    onClick={() => setSelectedImg(img)}
+                                    onClick={() => setSelectedImgId(imgId)}
                                     sx={{
-                                        border: selectedImg === img ? '2px solid #1976d2' : '2px solid transparent',
+                                        border: selectedImgId === imgId ? '2px solid #1976d2' : '2px solid transparent',
                                         borderRadius: 1,
-                                        boxShadow: selectedImg === img ? '0 0 8px rgba(25, 118, 210, 0.6)' : 'none',
+                                        boxShadow: selectedImgId === imgId ? '0 0 8px rgba(25, 118, 210, 0.6)' : 'none',
                                     }}
                                 >
                                     <CardMedia
                                         component="img"
-                                        image={img}
+                                        image={getPexelsImageUrl(imgId)}
                                         alt={`Drink image: ${query}`}
                                         sx={{ height: 140, objectFit: 'cover', borderRadius: 1 }}
                                     />

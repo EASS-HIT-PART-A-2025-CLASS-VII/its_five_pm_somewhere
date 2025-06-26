@@ -1,5 +1,5 @@
 from typing import List, Optional
-from pydantic import BaseModel, Field, HttpUrl
+from pydantic import BaseModel, Field
 from enum import Enum
 from uuid import UUID, uuid4
 
@@ -25,5 +25,5 @@ class DrinkRecipe(BaseModel):
     instructions: List[str] = Field(..., min_length=1)
     alcoholContent: bool
     type: DrinkType
-    imageUrl: Optional[HttpUrl] = None
+    imageId: Optional[int] = None
     isFavorite: bool

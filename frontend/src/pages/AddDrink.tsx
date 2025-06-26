@@ -29,6 +29,7 @@ import ImageSelectModal from '../components/ImageSelectModal';
 import { Lightbox } from '../components/Lightbox';
 import { useNavigate } from 'react-router-dom';
 import { MAX_WIDTH_PAGE } from '../constants';
+import { getPexelsImageUrl } from '../utils/imageService';
 
 const AddDrinkContainer = styled(Box)`
   padding: 2rem 1rem;
@@ -63,7 +64,7 @@ const AddDrink = () => {
   const [alcoholContent, setAlcoholContent] = useState(false);
   const [drinkType, setDrinkType] = useState<DrinkType>(DrinkType.COCKTAIL);
   const [isFavorite, setIsFavorite] = useState(false);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [imageId, setImageId] = useState<number | null>(null);
   const [imageModalOpen, setImageModalOpen] = useState(false);
 
   const [ingredientErrors, setIngredientErrors] = useState<{ name: boolean; amount: boolean }[]>([{ name: false, amount: false }]);
@@ -143,7 +144,7 @@ const AddDrink = () => {
       instructions: instructions.filter(i => i.trim() !== ''),
       alcoholContent,
       type: drinkType,
-      imageUrl: imageUrl || null,
+      imageId: imageId,
       isFavorite
     };
     const newDrink = await addDrink(drink);
@@ -332,20 +333,20 @@ const AddDrink = () => {
                   <Button variant="outlined" onClick={() => setImageModalOpen(true)}>
                     Choose Image
                   </Button>
-                  {imageUrl && (
+                  {imageId && (
                     <Button
                       variant="text"
                       color="error"
-                      onClick={() => setImageUrl(null)}
+                      onClick={() => setImageId(null)}
                     >
                       Remove Image
                     </Button>
                   )}
                 </Stack>
-                {imageUrl ? (
+                {imageId ? (
                   <CardMedia
                     component="img"
-                    image={imageUrl}
+                    image={getPexelsImageUrl(imageId)}
                     alt="Selected drink"
                     sx={{ height: 200, objectFit: 'cover', borderRadius: 2, maxWidth: 400 }}
                   />
@@ -376,7 +377,7 @@ const AddDrink = () => {
         <Lightbox onClose={() => setImageModalOpen(false)}>
           <ImageSelectModal
             onClose={() => setImageModalOpen(false)}
-            onSelect={setImageUrl}
+            onSelect={setImageId}
             fetchImages={fetchImages}
           />
         </Lightbox>

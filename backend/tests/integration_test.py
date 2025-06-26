@@ -1,6 +1,5 @@
 from unittest.mock import patch
 import uuid
-from pydantic import HttpUrl
 
 from app.models import Ingredient, DrinkRecipe, DrinkType, Unit
 from app.main import app, mixology_agent
@@ -20,9 +19,7 @@ mock_drink = DrinkRecipe(
     instructions=["Mix all ingredients", "Shake well", "Serve over ice"],
     alcoholContent=False,
     type=DrinkType.MOCKTAIL,
-    imageUrl=HttpUrl(
-        "https://images.pexels.com/photos/11481550/pexels-photo-11481550.jpeg?auto=compress&cs=tinysrgb&h=350"
-    ),
+    imageId=11481550,
     isFavorite=False,
 )
 
@@ -46,9 +43,9 @@ def test_fetch_images_success():
     data = response.json()
     assert isinstance(data, list)
     assert len(data) == payload["count"]
-    for url in data:
-        assert isinstance(url, str)
-        assert url.startswith("https://images.pexels.com/photos")
+    for image_id in data:
+        assert isinstance(image_id, int)
+        assert image_id > 0
 
 
 # @app.post("/drinks")
@@ -62,7 +59,7 @@ def test_add_new_drink_success():
         "instructions": ["Pour orange juice", "Add grenadine", "Serve with ice"],
         "alcoholContent": False,
         "type": DrinkType.MOCKTAIL,
-        "imageUrl": "https://images.pexels.com/photos/11481550/pexels-photo-11481550.jpeg?auto=compress&cs=tinysrgb&h=350",
+        "imageId": 11481550,
         "isFavorite": False,
     }
 
@@ -80,7 +77,7 @@ def test_add_new_drink_missing_fields_error():
         "instructions": [],
         "alcoholContent": True,
         "type": "",
-        "imageUrl": "invalid-url",
+        "imageId": 0,
         "isFavorite": False,
     }
     response = client.post("/drinks", json=broken_drink)
@@ -108,9 +105,7 @@ def test_toggle_favorite_status_success():
             instructions=["Shake it well!"],
             alcoholContent=True,
             type=DrinkType.COCKTAIL,
-            imageUrl=HttpUrl(
-                "https://images.pexels.com/photos/11481550/pexels-photo-11481550.jpeg?auto=compress&cs=tinysrgb&h=350"
-            ),
+            imageId=11481550,
             isFavorite=False,
         )
         drink_db.append(drink)
@@ -152,9 +147,7 @@ def test_get_random_drink_success():
             instructions=["Shake it well!"],
             alcoholContent=True,
             type=DrinkType.COCKTAIL,
-            imageUrl=HttpUrl(
-                "https://images.pexels.com/photos/11481550/pexels-photo-11481550.jpeg?auto=compress&cs=tinysrgb&h=350"
-            ),
+            imageId=11481550,
             isFavorite=False,
         )
         drink_db.append(test_drink)
@@ -179,11 +172,11 @@ def test_generate_drink_success():
 
     try:
         mock_ai_result = MockResult()
-        mock_image_url = HttpUrl("https://images.pexels.com/photos/mock-image.jpg")
+        mock_image_id = 11481550
 
         with patch.object(
             mixology_agent, "run_sync", return_value=mock_ai_result
-        ), patch("app.main.get_pexels_images", return_value=[mock_image_url]):
+        ), patch("app.main.get_pexels_images", return_value=[mock_image_id]):
 
             response = client.post(
                 "/drinks/generate", json=["apple juice", "lime", "mint"]
@@ -194,7 +187,7 @@ def test_generate_drink_success():
             returned_drink = DrinkRecipe(**data)
 
             assert returned_drink.name == "Mocktail Delight"
-            assert returned_drink.imageUrl == mock_image_url
+            assert returned_drink.imageId == mock_image_id
             assert len(returned_drink.ingredients) == 3
             assert any(
                 ing.name.lower() == "apple juice" for ing in returned_drink.ingredients

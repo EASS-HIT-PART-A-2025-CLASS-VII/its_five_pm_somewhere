@@ -26,9 +26,9 @@ export type DrinkRecipe = {
     alcoholContent: boolean;
     type: DrinkType;
     /**
-     * Imageurl
+     * Imageid
      */
-    imageUrl?: string | null;
+    imageId?: number | null;
     /**
      * Isfavorite
      */
@@ -185,7 +185,7 @@ export type FetchDrinkImagesDrinksImagesPostResponses = {
      * Response Fetch Drink Images Drinks Images Post
      * Successful Response
      */
-    200: Array<string>;
+    200: Array<number>;
 };
 
 export type FetchDrinkImagesDrinksImagesPostResponse = FetchDrinkImagesDrinksImagesPostResponses[keyof FetchDrinkImagesDrinksImagesPostResponses];

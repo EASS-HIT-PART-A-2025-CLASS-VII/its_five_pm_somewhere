@@ -72,7 +72,7 @@ mixology_agent: Agent[None, DrinkAIResult] = Agent(
         + ", ".join(drink_type_values)
         + ".\n"
         "- isFavorite should always be false.\n"
-        "- id and imageUrl is not relevant, so set it to None.\n"
+        "- id and imageId is not relevant, so set it to None.\n"
         "- Do not make up or invent ingredients; only use the provided list (or a subset if necessary).\n"
         "- Make sure the drink is balanced and pleasant—avoid combinations that are likely to be unpleasant or gross."
     ),
@@ -84,17 +84,14 @@ mixology_agent: Agent[None, DrinkAIResult] = Agent(
 # --- Utility Function ---
 def get_pexels_images(name: str, count: int, page: int):
     params = {"query": name, "per_page": count, "page": page}
-
     response = httpx.get(PEXELS_BASE_URL, headers=pexels_headers, params=params)
-
     if response.status_code != 200:
         return ErrorResponse(
             error_code=response.status_code,
             message="Pexels API error: " + response.text,
         )
-
     photos = response.json().get("photos", [])
-    return [photo["src"]["medium"] for photo in photos]
+    return [photo["id"] for photo in photos]
 
 
 @mixology_agent.output_validator
@@ -119,7 +116,7 @@ def list_all_drinks():
     return drink_db
 
 
-@app.post("/drinks/images", response_model=List[str])
+@app.post("/drinks/images", response_model=List[int])
 def fetch_drink_images(request: ImageSearchRequest):
     result = get_pexels_images(request.name, request.count, request.page)
 
@@ -171,12 +168,12 @@ def generate_drink_from_ingredients(ingredients: List[str]):
     result = get_pexels_images(new_drink.name, 1, 1)
 
     if isinstance(result, ErrorResponse):
-        raise HTTPException(
-            status_code=result.error_code,
-            detail="Oops! Something went wrong while fetching images for your drink. Please try again later!",
-        )
+        new_drink.imageId = None
+    elif not result:
+        new_drink.imageId = None
+    else:
+        new_drink.imageId = result[0]
 
-    new_drink.imageUrl = result[0]
     new_drink.id = uuid.uuid4()
     drink_db.append(new_drink)
 

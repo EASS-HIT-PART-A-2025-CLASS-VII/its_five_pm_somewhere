@@ -14,6 +14,7 @@ import {
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { DrinkRecipe } from '../client';
+import { getPexelsImageUrl } from '../utils/imageService';
 
 const LOADING_TIMEOUT_MS = 3000;
 
@@ -78,7 +79,7 @@ export const Recipe = () => {
       </Box>
 
       <img
-        src={drink.imageUrl ?? undefined}
+        src={getPexelsImageUrl(drink.imageId)}
         alt={drink.name}
         style={{
           width: '100%',
