@@ -15,8 +15,34 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { DrinkRecipe } from '../client';
 import { getPexelsImageUrl } from '../utils/imageService';
+import styled from 'styled-components';
+import { MAX_WIDTH_PAGE } from '../constants';
 
 const LOADING_TIMEOUT_MS = 3000;
+
+const SquareImageBox = styled(Box)`
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto 24px;
+  &:before {
+    content: "";
+    display: block;
+    padding-top: 100%;
+  }
+  overflow: hidden;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+`;
+
+const DrinkImage = styled.img`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+`;
 
 export const Recipe = () => {
   const { id } = useParams<{ id: string }>();
@@ -39,7 +65,7 @@ export const Recipe = () => {
   if (drink === undefined) {
     if (timedOut) {
       return (
-        <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+        <Box display="flex" justifyContent="center" alignItems="center" minHeight="calc(100vh - 64px)">
           <Typography variant="h6" color="textSecondary">
             We can’t find this drink… perhaps it’s still being shaken up?
           </Typography>
@@ -47,7 +73,7 @@ export const Recipe = () => {
       );
     }
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="calc(100vh - 64px)">
         <CircularProgress />
       </Box>
     );
@@ -55,7 +81,7 @@ export const Recipe = () => {
 
   if (drink === null) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="calc(100vh - 64px)">
         <Typography variant="h6" color="textSecondary">
           Your drink has not been found.
         </Typography>
@@ -64,7 +90,7 @@ export const Recipe = () => {
   }
 
   return (
-    <Box maxWidth="800px" margin="auto" p={3}>
+    <Box maxWidth={MAX_WIDTH_PAGE + "px"} margin="auto" p={3} pt={10}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Typography variant="h3" component="h1" fontWeight={600}>
           {drink.name}
@@ -78,18 +104,12 @@ export const Recipe = () => {
         <Chip label={drink.type} color="primary" />
       </Box>
 
-      <img
-        src={getPexelsImageUrl(drink.imageId)}
-        alt={drink.name}
-        style={{
-          width: '100%',
-          borderRadius: '16px',
-          maxHeight: '300px',
-          objectFit: 'cover',
-          marginBottom: '24px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-        }}
-      />
+      <SquareImageBox>
+        <DrinkImage
+          src={getPexelsImageUrl(drink.imageId)}
+          alt={drink.name}
+        />
+      </SquareImageBox>
 
       <Box
         sx={{
