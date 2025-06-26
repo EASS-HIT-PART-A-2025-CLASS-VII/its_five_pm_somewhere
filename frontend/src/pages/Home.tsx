@@ -11,7 +11,8 @@ import {
   ListItemText,
   Chip,
   Stack,
-  IconButton
+  IconButton,
+  Tooltip
 } from '@mui/material';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
@@ -82,6 +83,11 @@ const Home = () => {
     );
   };
 
+  const handleGetRandomDrink = async () => {
+    const randomDrink = await fetchRandomDrink();
+    navigate(`/recipe/${randomDrink.id}`);
+  };
+
   const filteredDrinks = drinks.filter(drink => {
     const matchesSearch = drink.name.toLowerCase().includes(search.toLowerCase());
     const matchesAlcohol =
@@ -109,9 +115,11 @@ const Home = () => {
         <Button variant="contained" color="primary" onClick={handleOpenModal}>
           What can I make?
         </Button>
-        <IconButton color="secondary" onClick={fetchRandomDrink}>
-          <ShuffleIcon />
-        </IconButton>
+        <Tooltip title="Get a random drink recipe">
+          <IconButton color="secondary" onClick={handleGetRandomDrink} >
+            <ShuffleIcon />
+          </IconButton>
+        </Tooltip>
       </Stack>
 
       <Box mb={2}>

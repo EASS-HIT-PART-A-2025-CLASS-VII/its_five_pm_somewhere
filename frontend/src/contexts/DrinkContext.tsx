@@ -6,14 +6,13 @@ import { IMAGES_PER_PAGE } from '../constants'
 
 interface DrinkContextType {
   drinks: DrinkRecipe[];
-  randomDrink: DrinkRecipe | null;
   loading: boolean;
   error: string | null;
   fetchDrinks: () => void;
   addDrink: (drink: DrinkRecipe) => Promise<DrinkRecipe>;
   toggleFavoriteStatus: (drinkId: string) => void;
-  generateDrink: (ingredients: string[]) => void;
-  fetchRandomDrink: () => void;
+  generateDrink: (ingredients: string[]) => Promise<DrinkRecipe>;
+  fetchRandomDrink: () => Promise<DrinkRecipe>;
   fetchImages: (query: string, page: number) => Promise<string[] | undefined>;
   clearError: () => void;
   getDrinkById: (id: string) => DrinkRecipe | undefined;
@@ -27,7 +26,6 @@ interface DrinkProviderProps {
 
 export const DrinkProvider: React.FC<DrinkProviderProps> = ({ children }) => {
   const [drinks, setDrinks] = useState<DrinkRecipe[]>([]);
-  const [randomDrink, setRandomDrink] = useState<DrinkRecipe | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [imageCache, setImageCache] = useState<Record<string, string[]>>({});
@@ -81,27 +79,30 @@ export const DrinkProvider: React.FC<DrinkProviderProps> = ({ children }) => {
     }
   };
 
-  const generateDrink = async (ingredients: string[]) => {
+  const generateDrink = async (ingredients: string[]): Promise<DrinkRecipe> => {
     setLoading(true);
     setError(null);
     try {
       const generatedDrink = await generateDrinkFromIngredients(ingredients);
-      setRandomDrink(generatedDrink);
+      setDrinks((prevDrinks) => [...prevDrinks, generatedDrink]);
+      return generatedDrink;
     } catch (err) {
       setError('Error generating drink');
+      throw err;
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchRandomDrink = async () => {
+  const fetchRandomDrink = async (): Promise<DrinkRecipe> => {
     setLoading(true);
     setError(null);
     try {
-      const random = await getRandomDrink();
-      setRandomDrink(random);
+      const randomDrink = await getRandomDrink();
+      return randomDrink
     } catch (err) {
       setError('Error fetching random drink');
+      throw err;
     } finally {
       setLoading(false);
     }
@@ -133,7 +134,6 @@ export const DrinkProvider: React.FC<DrinkProviderProps> = ({ children }) => {
     <DrinkContext.Provider
       value={{
         drinks,
-        randomDrink,
         loading,
         error,
         fetchDrinks,
