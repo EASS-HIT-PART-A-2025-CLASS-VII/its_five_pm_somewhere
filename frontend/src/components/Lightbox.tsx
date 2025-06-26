@@ -1,4 +1,4 @@
-import React from 'react'
+import { FC, ReactNode } from 'react'
 import styled from 'styled-components'
 import { APP_BAR_HEIGHT } from './Header';
 
@@ -27,10 +27,10 @@ const LightboxContent = styled.div`
 
 interface LightboxProps {
   onClose: () => void
-  children: React.ReactNode
+  children: ReactNode
 }
 
-export const Lightbox: React.FC<LightboxProps> = ({ onClose, children }) => {
+export const Lightbox: FC<LightboxProps> = ({ onClose, children }) => {
   return (
     <DimmedBackground onClick={onClose}>
       <LightboxContent onClick={(e: any) => e.stopPropagation()}>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { FormEvent, useState } from 'react';
 import {
   Box,
   Button,
@@ -50,7 +50,7 @@ const IngredientStack = styled(Stack)`
 
 const getUnitLabel = (unit: Unit) => (unit === Unit.TOP_UP ? 'top up' : unit);
 
-const AddDrink: React.FC = () => {
+const AddDrink = () => {
   const { addDrink, loading, error, clearError, fetchImages } = useDrinkContext();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -129,7 +129,7 @@ const AddDrink: React.FC = () => {
     return valid;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setFormError(null);
     if (!isFormValid()) {

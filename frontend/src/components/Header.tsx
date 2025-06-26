@@ -1,4 +1,3 @@
-import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { AppBar, Toolbar, Typography, Box } from '@mui/material';
 import styled from 'styled-components';
@@ -37,7 +36,7 @@ const StyledNavLink = styled(NavLink)`
   }
 `;
 
-const Header: React.FC = () => {
+const Header = () => {
   return (
     <StyledAppBar>
       <Toolbar sx={{ gap: '20px' }}>
