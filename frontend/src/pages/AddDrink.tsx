@@ -28,6 +28,7 @@ import { DrinkRecipe, DrinkType, Ingredient, Unit } from '../client';
 import { useDrinkContext } from '../contexts/DrinkContext';
 import ImageSelectModal from '../components/ImageSelectModal';
 import { Lightbox } from '../components/Lightbox';
+import { useNavigate } from 'react-router-dom';
 
 const AddDrinkContainer = styled(Box)`
   padding: 2rem 1rem;
@@ -54,6 +55,7 @@ const AddDrink = () => {
   const { addDrink, loading, error, clearError, fetchImages } = useDrinkContext();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const navigate = useNavigate();
 
   const [name, setName] = useState('');
   const [ingredients, setIngredients] = useState<Ingredient[]>([{ name: '', amount: 1, unit: Unit.PIECE }]);
@@ -145,7 +147,8 @@ const AddDrink = () => {
       imageUrl: imageUrl || null,
       isFavorite
     };
-    await addDrink(drink);
+    const newDrink = await addDrink(drink);
+    navigate(`/recipe/${newDrink.id}`)
   };
 
   return (

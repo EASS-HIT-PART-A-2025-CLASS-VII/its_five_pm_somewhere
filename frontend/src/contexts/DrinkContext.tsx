@@ -10,7 +10,7 @@ interface DrinkContextType {
   loading: boolean;
   error: string | null;
   fetchDrinks: () => void;
-  addDrink: (drink: DrinkRecipe) => void;
+  addDrink: (drink: DrinkRecipe) => Promise<DrinkRecipe>;
   toggleFavoriteStatus: (drinkId: string) => void;
   generateDrink: (ingredients: string[]) => void;
   fetchRandomDrink: () => void;
@@ -50,18 +50,21 @@ export const DrinkProvider: React.FC<DrinkProviderProps> = ({ children }) => {
     }
   };
 
-  const addDrink = async (drink: DrinkRecipe) => {
+  const addDrink = async (drink: DrinkRecipe): Promise<DrinkRecipe> => {
     setLoading(true);
     setError(null);
     try {
       const newDrink = await addNewDrink(drink);
       setDrinks((prevDrinks) => [...prevDrinks, newDrink]);
+      return newDrink;
     } catch (err) {
       setError('Error adding drink');
+      throw err;
     } finally {
       setLoading(false);
     }
   };
+
 
   const toggleFavoriteStatus = async (drinkId: string) => {
     setLoading(true);
