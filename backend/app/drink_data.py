@@ -342,7 +342,7 @@ drink_db: List[DrinkRecipe] = [
     DrinkRecipe(
         name="Classic Vanilla Milkshake",
         ingredients=[
-            Ingredient(name="Vanilla Ice Cream", amount=3, unit=Unit.SCOOP),
+            Ingredient(name="Vanilla Ice Cream", amount=3, unit=Unit.PIECE),
             Ingredient(name="Milk", amount=200, unit=Unit.MILLILITER),
             Ingredient(name="Vanilla Extract", amount=0.5, unit=Unit.TEASPOON),
         ],
@@ -362,7 +362,7 @@ drink_db: List[DrinkRecipe] = [
             Ingredient(name="Banana", amount=1, unit=Unit.PIECE),
             Ingredient(name="Chocolate Syrup", amount=2, unit=Unit.TABLESPOON),
             Ingredient(name="Milk", amount=200, unit=Unit.MILLILITER),
-            Ingredient(name="Ice Cream", amount=2, unit=Unit.SCOOP),
+            Ingredient(name="Ice Cream", amount=2, unit=Unit.PIECE),
         ],
         instructions=[
             "Blend all ingredients until smooth.",
