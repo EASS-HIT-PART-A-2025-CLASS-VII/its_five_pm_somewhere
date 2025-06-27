@@ -35,12 +35,17 @@ export const DrinkProvider: React.FC<DrinkProviderProps> = ({ children }) => {
     fetchDrinks();
   }, []);
 
+  const sortDrinksByName = (drinks: DrinkRecipe[]): DrinkRecipe[] => {
+    return [...drinks].sort((a, b) => a.name.localeCompare(b.name));
+  };
+
+
   const fetchDrinks = async () => {
     setLoading(true);
     setError(null);
     try {
       const data = await getAllDrinks();
-      setDrinks(data);
+      setDrinks(sortDrinksByName(data));
     } catch (err) {
       setError('Error fetching drinks');
     } finally {
@@ -53,7 +58,7 @@ export const DrinkProvider: React.FC<DrinkProviderProps> = ({ children }) => {
     setError(null);
     try {
       const newDrink = await addNewDrink(drink);
-      setDrinks((prevDrinks) => [...prevDrinks, newDrink]);
+      setDrinks((prevDrinks) => sortDrinksByName([...prevDrinks, newDrink]));
       return newDrink;
     } catch (err) {
       setError('Error adding drink');
@@ -70,7 +75,11 @@ export const DrinkProvider: React.FC<DrinkProviderProps> = ({ children }) => {
     try {
       const updatedDrink = await toggleFavorite(drinkId);
       setDrinks((prevDrinks) =>
-        prevDrinks.map((drink) => (drink.id === updatedDrink.id ? updatedDrink : drink))
+        sortDrinksByName(
+          prevDrinks.map((drink) =>
+            drink.id === updatedDrink.id ? updatedDrink : drink
+          )
+        )
       );
     } catch (err) {
       setError('Error toggling favorite');
@@ -84,7 +93,7 @@ export const DrinkProvider: React.FC<DrinkProviderProps> = ({ children }) => {
     setError(null);
     try {
       const generatedDrink = await generateDrinkFromIngredients(ingredients);
-      setDrinks((prevDrinks) => [...prevDrinks, generatedDrink]);
+      setDrinks((prevDrinks) => sortDrinksByName([...prevDrinks, generatedDrink]));
       return generatedDrink;
     } catch (err) {
       setError('Error generating drink');
