@@ -15,6 +15,8 @@ import {
   Tooltip
 } from '@mui/material';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import Fab from '@mui/material/Fab';
+import AddIcon from '@mui/icons-material/Add';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import ShuffleIcon from '@mui/icons-material/Shuffle';
 import SearchIcon from '@mui/icons-material/Search';
@@ -100,102 +102,118 @@ const Home = () => {
   });
 
   return (
-    <Box p={3} maxWidth={MAX_WIDTH_PAGE + "px"} margin="auto">
-      <Typography variant="h4" fontWeight={600} gutterBottom>
-        Discover Drinks 🍹
-      </Typography>
+    <>
+      <Box p={3} maxWidth={MAX_WIDTH_PAGE + "px"} margin="auto">
+        <Typography variant="h4" fontWeight={600} gutterBottom>
+          Discover Drinks 🍹
+        </Typography>
 
-      <Stack direction="row" spacing={2} mb={2}>
-        <TextField
-          fullWidth
-          placeholder="Explore drinks by name..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          InputProps={{ endAdornment: <SearchIcon color="action" /> }}
-        />
-        <Button variant="contained" color="primary" onClick={handleOpenModal}>
-          What can I make?
-        </Button>
-        <Tooltip title="Get a random drink recipe">
-          <IconButton color="secondary" onClick={handleGetRandomDrink} >
-            <ShuffleIcon />
-          </IconButton>
-        </Tooltip>
-      </Stack>
-
-      <Box mb={2}>
-        <ToggleButtonGroup
-          value={alcoholFilter}
-          exclusive
-          onChange={handleAlcoholFilter}
-          size="small"
-        >
-          <ToggleButton value="all">All</ToggleButton>
-          <ToggleButton value="alcoholic">Alcoholic</ToggleButton>
-          <ToggleButton value="non-alcoholic">Non-Alcoholic</ToggleButton>
-        </ToggleButtonGroup>
-      </Box>
-
-      <Stack direction="row" spacing={1} flexWrap="wrap" mb={2}>
-        {types.map((type) => (
-          <Chip
-            key={type}
-            label={type}
-            variant={selectedTypes.includes(type) ? "filled" : "outlined"}
-            color={selectedTypes.includes(type) ? "primary" : "default"}
-            onClick={() => handleTypeClick(type)}
-            sx={{ cursor: 'pointer' }}
+        <Stack direction="row" spacing={2} mb={2}>
+          <TextField
+            fullWidth
+            placeholder="Explore drinks by name..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            InputProps={{ endAdornment: <SearchIcon color="action" /> }}
           />
-        ))}
-      </Stack>
-
-
-      {showModal && (
-        <ModalPlaceholder>
-          <Typography variant="h6">Select Ingredients to Create a Drink</Typography>
-          {/* Placeholder for ingredient selection UI */}
-          <Typography>Ingredients Selection UI will go here...</Typography>
-          <Button variant="contained" color="secondary" onClick={handleCloseModal}>
-            Close
+          <Button variant="contained" color="primary" onClick={handleOpenModal}>
+            What can I make?
           </Button>
-        </ModalPlaceholder>
-      )}
-
-      <Box display="flex" flexWrap="wrap" gap={2} justifyContent="center">
-        {filteredDrinks.map((drink) => (
-          <DrinkCard
-            key={drink.id}
-            onClick={() => navigate(`/recipe/${drink.id}`)}
-          >
-            <ListItemAvatar>
-              <Avatar
-                variant="rounded"
-                src={getPexelsImageUrl(drink.imageId)}
-                sx={{ width: 80, height: 80, mb: 1 }}
-              />
-            </ListItemAvatar>
-            <ListItemText
-              primary={drink.name}
-              secondary={`${drink.type} • ${drink.alcoholContent ? 'Alcoholic' : 'Non-Alcoholic'}`}
-              sx={{ textAlign: 'center' }}
-            />
-            <IconButton
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleFavoriteStatus(drink.id!);
-              }}
-            >
-              {drink.isFavorite ? (
-                <FavoriteIcon color="error" />
-              ) : (
-                <FavoriteBorderIcon />
-              )}
+          <Tooltip title="Get a random drink recipe">
+            <IconButton color="secondary" onClick={handleGetRandomDrink} >
+              <ShuffleIcon />
             </IconButton>
-          </DrinkCard>
-        ))}
+          </Tooltip>
+        </Stack>
+
+        <Box mb={2}>
+          <ToggleButtonGroup
+            value={alcoholFilter}
+            exclusive
+            onChange={handleAlcoholFilter}
+            size="small"
+          >
+            <ToggleButton value="all">All</ToggleButton>
+            <ToggleButton value="alcoholic">Alcoholic</ToggleButton>
+            <ToggleButton value="non-alcoholic">Non-Alcoholic</ToggleButton>
+          </ToggleButtonGroup>
+        </Box>
+
+        <Stack direction="row" spacing={1} flexWrap="wrap" mb={2}>
+          {types.map((type) => (
+            <Chip
+              key={type}
+              label={type}
+              variant={selectedTypes.includes(type) ? "filled" : "outlined"}
+              color={selectedTypes.includes(type) ? "primary" : "default"}
+              onClick={() => handleTypeClick(type)}
+              sx={{ cursor: 'pointer' }}
+            />
+          ))}
+        </Stack>
+
+
+        {showModal && (
+          <ModalPlaceholder>
+            <Typography variant="h6">Select Ingredients to Create a Drink</Typography>
+            {/* Placeholder for ingredient selection UI */}
+            <Typography>Ingredients Selection UI will go here...</Typography>
+            <Button variant="contained" color="secondary" onClick={handleCloseModal}>
+              Close
+            </Button>
+          </ModalPlaceholder>
+        )}
+
+        <Box display="flex" flexWrap="wrap" gap={2} justifyContent="center">
+          {filteredDrinks.map((drink) => (
+            <DrinkCard
+              key={drink.id}
+              onClick={() => navigate(`/recipe/${drink.id}`)}
+            >
+              <ListItemAvatar>
+                <Avatar
+                  variant="rounded"
+                  src={getPexelsImageUrl(drink.imageId)}
+                  sx={{ width: 80, height: 80, mb: 1 }}
+                />
+              </ListItemAvatar>
+              <ListItemText
+                primary={drink.name}
+                secondary={`${drink.type} • ${drink.alcoholContent ? 'Alcoholic' : 'Non-Alcoholic'}`}
+                sx={{ textAlign: 'center' }}
+              />
+              <IconButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleFavoriteStatus(drink.id!);
+                }}
+              >
+                {drink.isFavorite ? (
+                  <FavoriteIcon color="error" />
+                ) : (
+                  <FavoriteBorderIcon />
+                )}
+              </IconButton>
+            </DrinkCard>
+          ))}
+        </Box>
+
       </Box>
 
-    </Box>
+      <Fab
+        color="primary"
+        sx={{
+          position: 'fixed',
+          bottom: 32,
+          right: 32,
+          backgroundColor: '#6a7df8',
+          '&:hover': { backgroundColor: '#3f54df' }
+        }}
+        onClick={() => navigate('/add')}
+      >
+        <AddIcon />
+      </Fab>
+    </>
   );
 };
 
