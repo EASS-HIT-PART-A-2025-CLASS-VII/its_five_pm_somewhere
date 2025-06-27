@@ -72,7 +72,7 @@ drink_db: List[DrinkRecipe] = [
         ],
         alcoholContent=True,
         type=DrinkType.COCKTAIL,
-        imageId=31589567,
+        imageId=32711953,
         isFavorite=False,
     ),
     DrinkRecipe(
@@ -124,7 +124,7 @@ drink_db: List[DrinkRecipe] = [
         ],
         alcoholContent=True,
         type=DrinkType.COCKTAIL,
-        imageId=31623993,
+        imageId=2336667,
         isFavorite=False,
     ),
     DrinkRecipe(
@@ -160,7 +160,7 @@ drink_db: List[DrinkRecipe] = [
         ],
         alcoholContent=True,
         type=DrinkType.COCKTAIL,
-        imageId=11481550,
+        imageId=12580185,
         isFavorite=False,
     ),
     DrinkRecipe(
