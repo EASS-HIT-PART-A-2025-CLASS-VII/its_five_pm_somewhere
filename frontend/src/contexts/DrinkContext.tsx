@@ -88,18 +88,14 @@ export const DrinkProvider: React.FC<DrinkProviderProps> = ({ children }) => {
     }
   };
 
+  //The component manages loading and error states internally, not through the global context.
   const generateDrink = async (ingredients: string[]): Promise<DrinkRecipe> => {
-    setLoading(true);
-    setError(null);
     try {
       const generatedDrink = await generateDrinkFromIngredients(ingredients);
       setDrinks((prevDrinks) => sortDrinksByName([...prevDrinks, generatedDrink]));
       return generatedDrink;
     } catch (err) {
-      setError('Error generating drink');
       throw err;
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -117,8 +113,7 @@ export const DrinkProvider: React.FC<DrinkProviderProps> = ({ children }) => {
     }
   };
 
-  // This function is intended for use with components that handle their own loading and error states.
-  // The consuming component should manage loading and error display locally, not via the global context.
+  //The component manages loading and error states internally, not through the global context.
   const fetchImages = async (query: string, page: number) => {
     const cacheKey = `${query}:${page}`;
     if (imageIdCache[cacheKey]) return imageIdCache[cacheKey];

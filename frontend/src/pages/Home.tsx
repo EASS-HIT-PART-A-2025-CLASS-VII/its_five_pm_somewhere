@@ -26,13 +26,8 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { MAX_WIDTH_PAGE } from '../constants';
 import { getPexelsImageUrl } from '../utils/imageService';
-
-const ModalPlaceholder = styled(Box)`
-  padding: 20px;
-  background-color: #f1f1f1;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-`;
+import IngredientSelectModal from '../components/IngredientSelectModal';
+import { Lightbox } from '../components/Lightbox';
 
 
 const DrinkCard = styled(ListItem)`
@@ -64,15 +59,13 @@ const DrinkCard = styled(ListItem)`
 
 const Home = () => {
   const navigate = useNavigate();
-  const { drinks, fetchRandomDrink, toggleFavoriteStatus } = useDrinkContext();
+  const { drinks, fetchRandomDrink, toggleFavoriteStatus, generateDrink } = useDrinkContext();
   const [search, setSearch] = useState('');
   const [alcoholFilter, setAlcoholFilter] = useState<'all' | 'alcoholic' | 'non-alcoholic'>('all');
-  const [showModal, setShowModal] = useState(false);
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+  const [ingredientModalOpen, setIngredientModalOpen] = useState(false);
   const types = Array.from(new Set(drinks.map(d => d.type)));
 
-  const handleOpenModal = () => setShowModal(true);
-  const handleCloseModal = () => setShowModal(false);
 
   const handleAlcoholFilter = (_: any, newValue: any) => {
     if (newValue) setAlcoholFilter(newValue);
@@ -116,7 +109,11 @@ const Home = () => {
             onChange={(e) => setSearch(e.target.value)}
             InputProps={{ endAdornment: <SearchIcon color="action" /> }}
           />
-          <Button variant="contained" color="primary" onClick={handleOpenModal}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => setIngredientModalOpen(true)}
+          >
             What can I make?
           </Button>
           <Tooltip title="Get a random drink recipe">
@@ -153,15 +150,14 @@ const Home = () => {
         </Stack>
 
 
-        {showModal && (
-          <ModalPlaceholder>
-            <Typography variant="h6">Select Ingredients to Create a Drink</Typography>
-            {/* Placeholder for ingredient selection UI */}
-            <Typography>Ingredients Selection UI will go here...</Typography>
-            <Button variant="contained" color="secondary" onClick={handleCloseModal}>
-              Close
-            </Button>
-          </ModalPlaceholder>
+        {ingredientModalOpen && (
+          <Lightbox onClose={() => setIngredientModalOpen(false)}>
+            <IngredientSelectModal
+              onClose={() => setIngredientModalOpen(false)}
+              generateDrink={generateDrink}
+              navigate={navigate}
+            />
+          </Lightbox>
         )}
 
         <Box display="flex" flexWrap="wrap" gap={2} justifyContent="center">
