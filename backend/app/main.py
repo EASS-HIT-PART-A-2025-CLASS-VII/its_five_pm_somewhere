@@ -13,6 +13,7 @@ from app.models import (
     DrinkAIResult,
     DrinkType,
     Unit,
+    IngredientsRequest,
 )
 
 from .drink_data import drink_db
@@ -46,7 +47,7 @@ app.add_middleware(
 pexels_headers = {"Authorization": PEXELS_API_KEY}
 
 llm_model = GroqModel(
-    "meta-llama/llama-4-scout-17b-16e-instruct",
+    "llama-3.3-70b-versatile",
     provider=GroqProvider(api_key=GROQ_API_KEY),
 )
 drink_type_values = [d.value for d in DrinkType]
@@ -154,8 +155,8 @@ def get_random_drink():
 
 
 @app.post("/drinks/generate", response_model=DrinkRecipe)
-def generate_drink_from_ingredients(ingredients: List[str]):
-    ingredient_str = ", ".join(ingredients)
+def generate_drink_from_ingredients(request: IngredientsRequest):
+    ingredient_str = ", ".join(request.ingredients)
     user_prompt = f"Create a drink using the following ingredients: {ingredient_str}."
 
     ai_result = mixology_agent.run_sync(user_prompt)
