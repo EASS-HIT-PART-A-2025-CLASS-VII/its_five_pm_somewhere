@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { DrinkRecipe } from '../client';
+import { ChooseIngredient, DrinkRecipe } from '../client';
 
 const API_URL = import.meta.env.VITE_REACT_APP_BACKEND_URL
 
@@ -11,6 +11,17 @@ export const getAllDrinks = async (): Promise<DrinkRecipe[]> => {
   } catch (error) {
     console.error('Error fetching drinks:', error);
     throw new Error('Could not fetch drinks');
+  }
+};
+
+// List all ingredients
+export const getAllIngredientsToChoose = async (): Promise<ChooseIngredient[]> => {
+  try {
+    const response = await axios.get<ChooseIngredient[]>(`${API_URL}/drinks/ingredients`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching ingredient:', error);
+    throw new Error('Could not fetch ingredient');
   }
 };
 

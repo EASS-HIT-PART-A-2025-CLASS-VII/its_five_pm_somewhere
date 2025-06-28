@@ -1,11 +1,12 @@
 import { createContext, useState, ReactNode, useContext, useEffect } from 'react';
-import { DrinkRecipe } from '../client';
-import { getAllDrinks, addNewDrink, toggleFavorite, generateDrinkFromIngredients, getRandomDrink } from '../services/drinkService';
+import { ChooseIngredient, DrinkRecipe } from '../client';
+import { getAllDrinks, addNewDrink, toggleFavorite, generateDrinkFromIngredients, getRandomDrink, getAllIngredientsToChoose } from '../services/drinkService';
 import { fetchDrinkImages } from '../services/imageService';
 import { IMAGES_PER_PAGE } from '../constants'
 
 interface DrinkContextType {
   drinks: DrinkRecipe[];
+  ingredientsToChoose: ChooseIngredient[];
   loading: boolean;
   error: string | null;
   fetchDrinks: () => void;
@@ -26,6 +27,7 @@ interface DrinkProviderProps {
 
 export const DrinkProvider: React.FC<DrinkProviderProps> = ({ children }) => {
   const [drinks, setDrinks] = useState<DrinkRecipe[]>([]);
+  const [ingredientsToChoose, setIngredientsToChoose] = useState<ChooseIngredient[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [imageIdCache, setImageIdCache] = useState<Record<string, number[]>>({});
@@ -33,6 +35,7 @@ export const DrinkProvider: React.FC<DrinkProviderProps> = ({ children }) => {
 
   useEffect(() => {
     fetchDrinks();
+    fetchIngredientsToChoose();
   }, []);
 
   const sortDrinksByName = (drinks: DrinkRecipe[]): DrinkRecipe[] => {
@@ -46,6 +49,19 @@ export const DrinkProvider: React.FC<DrinkProviderProps> = ({ children }) => {
     try {
       const data = await getAllDrinks();
       setDrinks(sortDrinksByName(data));
+    } catch (err) {
+      setError('Error fetching drinks');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchIngredientsToChoose = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await getAllIngredientsToChoose();
+      setIngredientsToChoose(data);
     } catch (err) {
       setError('Error fetching drinks');
     } finally {
@@ -138,6 +154,7 @@ export const DrinkProvider: React.FC<DrinkProviderProps> = ({ children }) => {
     <DrinkContext.Provider
       value={{
         drinks,
+        ingredientsToChoose,
         loading,
         error,
         fetchDrinks,

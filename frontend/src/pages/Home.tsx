@@ -59,7 +59,7 @@ const DrinkCard = styled(ListItem)`
 
 const Home = () => {
   const navigate = useNavigate();
-  const { drinks, fetchRandomDrink, toggleFavoriteStatus, generateDrink } = useDrinkContext();
+  const { drinks, ingredientsToChoose, fetchRandomDrink, toggleFavoriteStatus, generateDrink } = useDrinkContext();
   const [search, setSearch] = useState('');
   const [alcoholFilter, setAlcoholFilter] = useState<'all' | 'alcoholic' | 'non-alcoholic'>('all');
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
@@ -156,6 +156,7 @@ const Home = () => {
               onClose={() => setIngredientModalOpen(false)}
               generateDrink={generateDrink}
               navigate={navigate}
+              ingredientsToChoose={ingredientsToChoose}
             />
           </Lightbox>
         )}

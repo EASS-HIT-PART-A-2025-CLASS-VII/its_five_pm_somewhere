@@ -1,4 +1,4 @@
-import { useState, useEffect, FC } from 'react';
+import { useState, FC } from 'react';
 import {
     Box,
     Button,
@@ -15,31 +15,16 @@ import {
 } from '@mui/material';
 import styled from 'styled-components';
 import { getPexelsImageUrl } from '../utils/imageService';
-import { DrinkRecipe } from '../client';
-
-export interface Ingredient {
-    name: string;
-    imageId: number;
-}
+import { ChooseIngredient, DrinkRecipe } from '../client';
 
 interface IngredientSelectModalProps {
     onClose: () => void;
     generateDrink: (ingredients: string[]) => Promise<DrinkRecipe>;
     navigate: (path: string) => void;
+    ingredientsToChoose: ChooseIngredient[];
 }
 
 const MAX_PER_ROW = 4;
-
-const ingredientsDB = [
-    { name: 'Lemon', imageId: 1414110 },
-    { name: 'Lime', imageId: 357577 },
-    { name: 'Mint', imageId: 1264000 },
-    { name: 'Gin', imageId: 1277203 },
-    { name: 'Tonic', imageId: 8131585 },
-    { name: 'Strawberry', imageId: 6944172 },
-    { name: 'Vodka', imageId: 3738485 },
-    { name: 'Orange', imageId: 691166 },
-]
 
 const IngredientFlexContainer = styled(Box)`
   display: flex;
@@ -67,23 +52,17 @@ const IngredientSelectModal: FC<IngredientSelectModalProps> = ({
     onClose,
     generateDrink,
     navigate,
+    ingredientsToChoose
 }) => {
     const [query, setQuery] = useState('');
-    const [ingredients, setIngredients] = useState<Ingredient[]>();
     const [selected, setSelected] = useState<string[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
 
-    // In a real app, you'd fetch ingredients from backend or context
-    // For demo, use a static list or fetch from your API
-    useEffect(() => {
-        // Example: fetch ingredients from API or context
-        // setLoading(true);
-        // fetchIngredients(query).then(setIngredients).catch(setError).finally(() => setLoading(false));
-        // For now, mock some ingredients
-        setIngredients(ingredientsDB);
-    }, [setQuery]);
+    const filteredIngredients = ingredientsToChoose.filter(ingredient =>
+        ingredient.name.toLowerCase().includes(query.toLowerCase())
+    );
 
     const toggleIngredient = (name: string) => {
         setSelected(prev =>
@@ -94,13 +73,12 @@ const IngredientSelectModal: FC<IngredientSelectModalProps> = ({
     };
 
     const handleCreateDrink = async () => {
-        if (selected.length === 0) {
+        if (selected.length < 3) {
             setSnackbarOpen(true);
             return;
         }
         setLoading(true);
         try {
-            console.log('selected', selected)
             const newDrink = await generateDrink(selected);
             navigate(`/recipe/${newDrink.id}`);
             onClose();
@@ -135,52 +113,49 @@ const IngredientSelectModal: FC<IngredientSelectModalProps> = ({
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="e.g. lemon, mint, gin"
                 />
-                {loading && (
-                    <Box display="flex" justifyContent="center" py={2}>
-                        <CircularProgress />
-                    </Box>
-                )}
                 {error && (
                     <Alert severity="error" sx={{ mb: 2 }}>
                         {error}
                     </Alert>
                 )}
-                {!loading && !error && (
-                    <>
-                        <IngredientFlexContainer>
-                            {ingredients?.map((ingredient) => (
-                                <IngredientCard
-                                    key={ingredient.name}
-                                    $isSelected={selected.includes(ingredient.name)}
-                                    onClick={() => toggleIngredient(ingredient.name)}
-                                >
-                                    <CardMedia
-                                        component="img"
-                                        image={getPexelsImageUrl(ingredient.imageId)}
-                                        alt={ingredient.name}
-                                        sx={{ height: 140, objectFit: 'cover', borderRadius: 1 }}
-                                    />
-                                    <Box p={1}>
-                                        <Typography variant="body2" textAlign="center">
-                                            {ingredient.name}
-                                        </Typography>
-                                    </Box>
-                                </IngredientCard>
-                            ))}
-                        </IngredientFlexContainer>
-                        <Stack direction="row" spacing={1} flexWrap="wrap" mt={1}>
-                            {selected.map(name => (
-                                <Chip key={name} label={name} onDelete={() => toggleIngredient(name)} />
-                            ))}
-                        </Stack>
-                    </>
+                <IngredientFlexContainer>
+                    {filteredIngredients.map((ingredient) => (
+                        <IngredientCard
+                            key={ingredient.name}
+                            $isSelected={selected.includes(ingredient.name)}
+                            onClick={() => toggleIngredient(ingredient.name)}
+                        >
+                            <CardMedia
+                                component="img"
+                                image={getPexelsImageUrl(ingredient.imageId)}
+                                alt={ingredient.name}
+                                sx={{ height: 140, objectFit: 'cover', borderRadius: 1 }}
+                            />
+                            <Box p={1}>
+                                <Typography variant="body2" textAlign="center">
+                                    {ingredient.name}
+                                </Typography>
+                            </Box>
+                        </IngredientCard>
+                    ))}
+                </IngredientFlexContainer>
+                {filteredIngredients.length === 0 && (
+                    <Typography variant="body1" textAlign="center" py={2}>
+                        No ingredients match your search
+                    </Typography>
                 )}
+                <Stack direction="row" spacing={1} flexWrap="wrap" mt={1}>
+                    {selected.map(name => (
+                        <Chip key={name} label={name} onDelete={() => toggleIngredient(name)} />
+                    ))}
+                </Stack>
                 <Button
                     onClick={handleCreateDrink}
                     variant="contained"
                     color="primary"
                     fullWidth
                     disabled={loading}
+                    endIcon={loading ? <CircularProgress size={20} /> : null}
                 >
                     {loading ? 'Creating...' : 'Create Drink'}
                 </Button>
@@ -189,7 +164,7 @@ const IngredientSelectModal: FC<IngredientSelectModalProps> = ({
                 open={snackbarOpen}
                 autoHideDuration={3000}
                 onClose={() => setSnackbarOpen(false)}
-                message="Please select at least one ingredient."
+                message="Please select at least two ingredients."
             />
         </Paper>
     );
