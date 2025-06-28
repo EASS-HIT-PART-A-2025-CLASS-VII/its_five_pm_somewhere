@@ -63,6 +63,7 @@ const Home = () => {
   const [search, setSearch] = useState('');
   const [alcoholFilter, setAlcoholFilter] = useState<'all' | 'alcoholic' | 'non-alcoholic'>('all');
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [ingredientModalOpen, setIngredientModalOpen] = useState(false);
   const types = Array.from(new Set(drinks.map(d => d.type)));
 
@@ -91,8 +92,10 @@ const Home = () => {
       (alcoholFilter === 'alcoholic' && drink.alcoholContent) ||
       (alcoholFilter === 'non-alcoholic' && !drink.alcoholContent);
     const matchesTypes = selectedTypes.length === 0 || selectedTypes.includes(drink.type);
-    return matchesSearch && matchesAlcohol && matchesTypes;
+    const matchesFavorites = !showFavoritesOnly || drink.isFavorite;
+    return matchesSearch && matchesAlcohol && matchesTypes && matchesFavorites;
   });
+
 
   return (
     <>
@@ -123,7 +126,14 @@ const Home = () => {
           </Tooltip>
         </Stack>
 
-        <Box mb={2}>
+        <Box
+          mb={2}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
           <ToggleButtonGroup
             value={alcoholFilter}
             exclusive
@@ -134,7 +144,16 @@ const Home = () => {
             <ToggleButton value="alcoholic">Alcoholic</ToggleButton>
             <ToggleButton value="non-alcoholic">Non-Alcoholic</ToggleButton>
           </ToggleButtonGroup>
+          <Chip
+            icon={<FavoriteIcon />}
+            label="Favorites"
+            variant={showFavoritesOnly ? "filled" : "outlined"}
+            color={showFavoritesOnly ? "primary" : "default"}
+            onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+            sx={{ cursor: 'pointer', m: 0 }}
+          />
         </Box>
+
 
         <Stack direction="row" spacing={1} flexWrap="wrap" mb={2}>
           {types.map((type) => (
