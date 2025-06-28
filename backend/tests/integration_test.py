@@ -179,7 +179,8 @@ def test_generate_drink_success():
         ), patch("app.main.get_pexels_images", return_value=[mock_image_id]):
 
             response = client.post(
-                "/drinks/generate", json=["apple juice", "lime", "mint"]
+                "/drinks/generate",
+                json={"ingredients": ["apple juice", "lime", "mint"]},
             )
 
             assert response.status_code == 200
