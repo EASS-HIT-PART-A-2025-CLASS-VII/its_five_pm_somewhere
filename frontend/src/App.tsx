@@ -23,7 +23,7 @@ const MainContent = styled.main`
   min-height: calc(100vh - ${APP_BAR_HEIGHT}px);
 `;
 
-const App: React.FC = () => {
+const App = () => {
   return (
     <>
       <GlobalStyles />

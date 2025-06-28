@@ -2,7 +2,7 @@ import { Alert, Snackbar } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useDrinkContext } from '../contexts/DrinkContext'
 
-const GlobalError: React.FC = () => {
+const GlobalError = () => {
   const { error, clearError } = useDrinkContext();
   const [open, setOpen] = useState<boolean>(false);
 

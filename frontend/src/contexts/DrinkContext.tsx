@@ -1,4 +1,4 @@
-import { createContext, useState, ReactNode, useContext, useEffect } from 'react';
+import { createContext, useState, ReactNode, useContext, useEffect, FC } from 'react';
 import { ChooseIngredient, DrinkRecipe } from '../client';
 import { getAllDrinks, addNewDrink, toggleFavorite, generateDrinkFromIngredients, getRandomDrink, getAllIngredientsToChoose } from '../services/drinkService';
 import { fetchDrinkImages } from '../services/imageService';
@@ -25,7 +25,7 @@ interface DrinkProviderProps {
   children: ReactNode;  // Explicitly defining the children prop type
 }
 
-export const DrinkProvider: React.FC<DrinkProviderProps> = ({ children }) => {
+export const DrinkProvider: FC<DrinkProviderProps> = ({ children }) => {
   const [drinks, setDrinks] = useState<DrinkRecipe[]>([]);
   const [ingredientsToChoose, setIngredientsToChoose] = useState<ChooseIngredient[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
