@@ -1,14 +1,25 @@
 services:
   backend:
     build:
-      context: .
-      dockerfile: backend/Dockerfile
+      context: ./backend
+      dockerfile: Dockerfile
     ports:
       - "8000:8000"
     volumes:
       - ./backend:/app
     env_file:
       - ./backend/.env
+    depends_on:
+      - pexels_service
+
+  pexels_service:
+    build:
+      context: ./pexels_service
+      dockerfile: Dockerfile
+    ports:
+      - "9000:9000"
+    env_file:
+      - ./pexels_service/.env
 
   frontend:
     build: ./frontend
@@ -24,8 +35,8 @@ services:
 
   test:
     build:
-      context: .
-      dockerfile: backend/Dockerfile
+      context: ./backend
+      dockerfile: Dockerfile
     depends_on:
       - backend
     command: [ "pytest", "tests/integration_test.py", "-v" ]

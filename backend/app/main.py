@@ -27,9 +27,11 @@ from pydantic_ai.providers.groq import GroqProvider
 
 # --- Load Environment variables ---
 load_dotenv()
-PEXELS_API_KEY = os.getenv("PEXELS_API_KEY", "")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
-PEXELS_BASE_URL = "https://api.pexels.com/v1/search"
+
+PEXELS_SERVICE_URL = os.getenv(
+    "PEXELS_SERVICE_URL", "http://pexels_service:9000/images"
+)
 
 # --- FastAPI App Initialization ---
 app = FastAPI()
@@ -46,8 +48,6 @@ app.add_middleware(
 )
 
 # --- AI Agent Setup ---
-pexels_headers = {"Authorization": PEXELS_API_KEY}
-
 llm_model = GroqModel(
     "llama-3.3-70b-versatile",
     provider=GroqProvider(api_key=GROQ_API_KEY),
@@ -85,18 +85,6 @@ mixology_agent: Agent[None, DrinkAIResult] = Agent(
 
 
 # --- Utility Function ---
-def get_pexels_images(name: str, count: int, page: int):
-    params = {"query": name, "per_page": count, "page": page}
-    response = httpx.get(PEXELS_BASE_URL, headers=pexels_headers, params=params)
-    if response.status_code != 200:
-        return ErrorResponse(
-            error_code=response.status_code,
-            message="Pexels API error: " + response.text,
-        )
-    photos = response.json().get("photos", [])
-    return [photo["id"] for photo in photos]
-
-
 @mixology_agent.output_validator
 async def validate_ai_output(
     ctx: RunContext[None], result: DrinkAIResult
@@ -126,15 +114,13 @@ def list_all_ingredients_info():
 
 @app.post("/drinks/images", response_model=List[int])
 def fetch_drink_images(request: ImageSearchRequest):
-    result = get_pexels_images(request.name, request.count, request.page)
-
-    if isinstance(result, ErrorResponse):
+    response = httpx.post(PEXELS_SERVICE_URL, json=request.dict())
+    if response.status_code != 200:
         raise HTTPException(
-            status_code=result.error_code,
+            status_code=response.status_code,
             detail="Looks like our image search is a bit thirsty! No photo this time, but the recipe is still delicious.",
         )
-
-    return result
+    return response.json()
 
 
 @app.post("/drinks", response_model=DrinkRecipe)
@@ -162,25 +148,30 @@ def get_random_drink():
 
 
 @app.post("/drinks/generate", response_model=DrinkRecipe)
-def generate_drink_from_ingredients(request: IngredientsRequest):
+async def generate_drink_from_ingredients(request: IngredientsRequest):
     ingredient_str = ", ".join(request.ingredients)
     user_prompt = f"Create a drink using the following ingredients: {ingredient_str}."
 
-    ai_result = mixology_agent.run_sync(user_prompt)
+    ai_result = await mixology_agent.run(user_prompt)
 
     if isinstance(ai_result.output, ErrorResponse):
         raise HTTPException(status_code=422, detail=ai_result.output.message)
 
     new_drink = ai_result.output
 
-    result = get_pexels_images(new_drink.name, 1, 1)
+    imgRequest = ImageSearchRequest(name=new_drink.name, count=1, page=1)
+    async with httpx.AsyncClient() as client:
+        imgResponse = await client.post(PEXELS_SERVICE_URL, json=imgRequest.dict())
+        if imgResponse.status_code != 200:
+            new_drink.imageId = None
+        else:
+            ids = imgResponse.json()
+            new_drink.imageId = ids[0] if ids else None
 
-    if isinstance(result, ErrorResponse):
-        new_drink.imageId = None
-    elif not result:
+    if imgResponse.status_code != 200:
         new_drink.imageId = None
     else:
-        new_drink.imageId = result[0]
+        new_drink.imageId = imgResponse.json()[0]
 
     new_drink.id = uuid.uuid4()
     drink_db.append(new_drink)
