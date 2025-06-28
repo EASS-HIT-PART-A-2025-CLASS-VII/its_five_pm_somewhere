@@ -3,7 +3,6 @@ import {
     Box,
     Button,
     CardActionArea,
-    CardMedia,
     Paper,
     Stack,
     TextField,
@@ -15,6 +14,7 @@ import {
 import styled from 'styled-components';
 import { IMAGES_PER_PAGE } from '../constants';
 import { getPexelsImageUrl } from '../utils/imageService';
+import { DrinkImage, SquareImageBox } from '../styles/globalStyles';
 
 const MAX_PAGE = 4;
 const DEBOUNCE_TIMEOUT = 500;
@@ -139,12 +139,12 @@ const ImageSelectModal: FC<ImageSelectModalProps> = ({
                                         boxShadow: selectedImgId === imgId ? '0 0 8px rgba(25, 118, 210, 0.6)' : 'none',
                                     }}
                                 >
-                                    <CardMedia
-                                        component="img"
-                                        image={getPexelsImageUrl(imgId)}
-                                        alt={`Drink image: ${query}`}
-                                        sx={{ height: 140, objectFit: 'cover', borderRadius: 1 }}
-                                    />
+                                    <SquareImageBox>
+                                        <DrinkImage
+                                            src={getPexelsImageUrl(imgId)}
+                                            alt={`Drink image: ${query}`}
+                                        />
+                                    </SquareImageBox>
                                 </CardActionArea>
                             </ImageCard>
                         ))}

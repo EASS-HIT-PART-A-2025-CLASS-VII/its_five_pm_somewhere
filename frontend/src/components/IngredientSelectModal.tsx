@@ -3,7 +3,6 @@ import {
     Box,
     Button,
     CardActionArea,
-    CardMedia,
     Paper,
     Stack,
     TextField,
@@ -16,6 +15,7 @@ import {
 import styled from 'styled-components';
 import { getPexelsImageUrl } from '../utils/imageService';
 import { ChooseIngredient, DrinkRecipe } from '../client';
+import { DrinkImage, SquareImageBox } from '../styles/globalStyles';
 
 interface IngredientSelectModalProps {
     onClose: () => void;
@@ -125,12 +125,12 @@ const IngredientSelectModal: FC<IngredientSelectModalProps> = ({
                             $isSelected={selected.includes(ingredient.name)}
                             onClick={() => toggleIngredient(ingredient.name)}
                         >
-                            <CardMedia
-                                component="img"
-                                image={getPexelsImageUrl(ingredient.imageId)}
-                                alt={ingredient.name}
-                                sx={{ height: 140, objectFit: 'cover', borderRadius: 1 }}
-                            />
+                            <SquareImageBox>
+                                <DrinkImage
+                                    src={getPexelsImageUrl(ingredient.imageId)}
+                                    alt={ingredient.name}
+                                />
+                            </SquareImageBox>
                             <Box p={1}>
                                 <Typography variant="body2" textAlign="center">
                                     {ingredient.name}

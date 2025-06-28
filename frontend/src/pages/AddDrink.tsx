@@ -3,7 +3,6 @@ import {
   Box,
   Button,
   Card,
-  CardMedia,
   CircularProgress,
   Container,
   Divider,
@@ -30,6 +29,7 @@ import { Lightbox } from '../components/Lightbox';
 import { useNavigate } from 'react-router-dom';
 import { MAX_WIDTH_PAGE } from '../constants';
 import { getPexelsImageUrl } from '../utils/imageService';
+import { DrinkImage, SquareImageBox } from '../styles/globalStyles';
 
 const AddDrinkContainer = styled(Box)`
   padding: 2rem 1rem;
@@ -344,12 +344,12 @@ const AddDrink = () => {
                   )}
                 </Stack>
                 {imageId ? (
-                  <CardMedia
-                    component="img"
-                    image={getPexelsImageUrl(imageId)}
-                    alt="Selected drink"
-                    sx={{ height: 200, objectFit: 'cover', borderRadius: 2, maxWidth: 400 }}
-                  />
+                  <SquareImageBox>
+                    <DrinkImage
+                      src={getPexelsImageUrl(imageId)}
+                      alt={"Selected drink"}
+                    />
+                  </SquareImageBox>
                 ) : (
                   <Typography color="text.secondary">No image selected</Typography>
                 )}
