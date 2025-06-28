@@ -14,9 +14,11 @@ from app.models import (
     DrinkType,
     Unit,
     IngredientsRequest,
+    ChooseIngredient,
 )
 
 from .drink_data import drink_db
+from .ingredient_data import ingredient_db
 from typing import List
 
 from pydantic_ai import Agent, RunContext
@@ -115,6 +117,11 @@ async def validate_ai_output(
 @app.get("/drinks", response_model=List[DrinkRecipe])
 def list_all_drinks():
     return drink_db
+
+
+@app.get("/drinks/ingredients", response_model=List[ChooseIngredient])
+def list_all_ingredients_info():
+    return ingredient_db
 
 
 @app.post("/drinks/images", response_model=List[int])
