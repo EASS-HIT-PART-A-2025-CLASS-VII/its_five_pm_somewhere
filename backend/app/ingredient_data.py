@@ -63,7 +63,7 @@ ingredient_db: List[ChooseIngredient] = [
     # Herbs & spices
     ChooseIngredient(name="Mint", imageId=1264000),
     ChooseIngredient(name="Basil Leaves", imageId=1391505),
-    ChooseIngredient(name="Cinnamon", imageId=71128),
+    ChooseIngredient(name="Cinnamon", imageId=301669),
     ChooseIngredient(name="Nutmeg", imageId=672046),
     ChooseIngredient(name="Fresh Ginger", imageId=128403),
     # Others & garnishes
