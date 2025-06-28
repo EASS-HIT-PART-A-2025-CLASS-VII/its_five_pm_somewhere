@@ -24,7 +24,7 @@ import { useDrinkContext } from '../contexts/DrinkContext';
 import { useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import { MAX_WIDTH_PAGE } from '../constants';
+import { MAX_WIDTH_PAGE, ZIndex } from '../constants';
 import { getPexelsImageUrl } from '../utils/imageService';
 import IngredientSelectModal from '../components/IngredientSelectModal';
 import { Lightbox } from '../components/Lightbox';
@@ -223,7 +223,8 @@ const Home = () => {
           bottom: 32,
           right: 32,
           backgroundColor: '#6a7df8',
-          '&:hover': { backgroundColor: '#3f54df' }
+          '&:hover': { backgroundColor: '#3f54df' },
+          zIndex: `${ZIndex.ADD_BTN}`
         }}
         onClick={() => navigate('/add')}
       >

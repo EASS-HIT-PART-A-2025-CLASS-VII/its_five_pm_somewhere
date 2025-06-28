@@ -98,6 +98,8 @@ const IngredientSelectModal: FC<IngredientSelectModalProps> = ({
                 transform: 'translate(-50%, -50%)',
                 width: { xs: '90%', sm: '80%', md: '60%' },
                 maxWidth: 800,
+                maxHeight: '80vh',
+                overflowY: 'auto',
                 p: 4,
                 borderRadius: 4,
                 outline: 'none',

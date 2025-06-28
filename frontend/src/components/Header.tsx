@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { AppBar, Toolbar, Typography } from '@mui/material';
 import styled from 'styled-components';
+import { ZIndex } from '../constants';
 
 export const APP_BAR_HEIGHT = 64;
 
@@ -9,7 +10,7 @@ const StyledAppBar = styled(AppBar)`
   height: ${APP_BAR_HEIGHT}px;
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: ${ZIndex.HEADER};
 `;
 
 const Logo = styled(Typography)`

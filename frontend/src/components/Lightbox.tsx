@@ -1,5 +1,6 @@
-import { FC, ReactNode } from 'react'
+import { FC, ReactNode, useEffect } from 'react'
 import styled from 'styled-components'
+import { ZIndex } from '../constants';
 import { APP_BAR_HEIGHT } from './Header';
 
 const DimmedBackground = styled.div`
@@ -12,7 +13,7 @@ const DimmedBackground = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: ${ZIndex.LIGHT_BOX};
 `;
 
 const LightboxContent = styled.div`
@@ -22,8 +23,9 @@ const LightboxContent = styled.div`
   max-height: 90vh;
   padding: 24px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-  overflow: auto;
-`
+  overflow-y: auto;
+  overflow-x: hidden;
+`;
 
 interface LightboxProps {
   onClose: () => void
@@ -31,6 +33,15 @@ interface LightboxProps {
 }
 
 export const Lightbox: FC<LightboxProps> = ({ onClose, children }) => {
+  // Disable body scroll when lightbox is open
+  useEffect(() => {
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, []);
+
   return (
     <DimmedBackground onClick={onClose}>
       <LightboxContent onClick={(e: any) => e.stopPropagation()}>
