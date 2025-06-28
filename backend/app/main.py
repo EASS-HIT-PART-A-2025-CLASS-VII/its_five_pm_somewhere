@@ -76,7 +76,7 @@ mixology_agent: Agent[None, DrinkAIResult] = Agent(
         + ".\n"
         "- isFavorite should always be false.\n"
         "- id and imageId is not relevant, so set it to None.\n"
-        "- Do not make up or invent ingredients; only use the provided list (or a subset if necessary).\n"
+        "- Do not make up or invent ingredients; use only ingredients from the provided list, and it is perfectly fine to use just a subset rather than all of them.\n"
         "- Make sure the drink is balanced and pleasant—avoid combinations that are likely to be unpleasant or gross."
     ),
     output_type=DrinkAIResult,
