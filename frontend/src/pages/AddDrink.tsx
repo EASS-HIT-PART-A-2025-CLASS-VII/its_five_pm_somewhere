@@ -31,6 +31,12 @@ import { MAX_WIDTH_PAGE } from '../constants';
 import { getPexelsImageUrl } from '../utils/imageService';
 import { DrinkImage, SquareImageBox } from '../styles/globalStyles';
 
+type IngredientForm = {
+  name: string;
+  amount: number | '';
+  unit: Unit;
+};
+
 const AddDrinkContainer = styled(Box)`
   padding: 2rem 1rem;
   min-height: calc(100vh - 64px);
@@ -59,7 +65,7 @@ const AddDrink = () => {
   const navigate = useNavigate();
 
   const [name, setName] = useState('');
-  const [ingredients, setIngredients] = useState<Ingredient[]>([{ name: '', amount: 1, unit: Unit.PIECE }]);
+  const [ingredients, setIngredients] = useState<IngredientForm[]>([{ name: '', amount: 1, unit: Unit.PIECE }]);
   const [instructions, setInstructions] = useState<string[]>(['']);
   const [alcoholContent, setAlcoholContent] = useState(false);
   const [drinkType, setDrinkType] = useState<DrinkType>(DrinkType.COCKTAIL);
@@ -70,9 +76,11 @@ const AddDrink = () => {
   const [ingredientErrors, setIngredientErrors] = useState<{ name: boolean; amount: boolean }[]>([{ name: false, amount: false }]);
   const [formError, setFormError] = useState<string | null>(null);
 
-  const validateIngredient = (ingredient: Ingredient) => ({
+  const validateIngredient = (ingredient: IngredientForm) => ({
     name: ingredient.name.trim().length < 2,
-    amount: ingredient.unit === Unit.TOP_UP ? false : ingredient.amount <= 0
+    amount: ingredient.unit === Unit.TOP_UP
+      ? false
+      : (ingredient.amount === '' || isNaN(Number(ingredient.amount)) || Number(ingredient.amount) <= 0)
   });
 
   const handleAddIngredient = () => {
@@ -85,7 +93,7 @@ const AddDrink = () => {
     setIngredientErrors(ingredientErrors.filter((_, i) => i !== index));
   };
 
-  const handleIngredientChange = (index: number, field: keyof Ingredient, value: string | number | Unit) => {
+  const handleIngredientChange = (index: number, field: keyof IngredientForm, value: string | number | Unit) => {
     const newIngredients = [...ingredients];
     if (field === 'unit') {
       newIngredients[index].unit = value as Unit;
@@ -93,7 +101,11 @@ const AddDrink = () => {
         newIngredients[index].amount = 1;
       }
     } else if (field === 'amount') {
-      newIngredients[index].amount = typeof value === 'number' ? value : parseFloat(value as string) || 1;
+      if (typeof value === 'string' && value === '') {
+        newIngredients[index].amount = '';
+      } else {
+        newIngredients[index].amount = typeof value === 'number' ? value : parseFloat(value as string);
+      }
     } else if (field === 'name') {
       newIngredients[index].name = value as string;
     }
@@ -140,7 +152,7 @@ const AddDrink = () => {
     }
     const drink: DrinkRecipe = {
       name,
-      ingredients: ingredients.filter(i => i.name.trim().length >= 2),
+      ingredients: ingredients.filter(i => i.name.trim().length >= 2 && i.amount !== '' && !isNaN(Number(i.amount))).map(i => ({ ...i, amount: Number(i.amount) })),
       instructions: instructions.filter(i => i.trim() !== ''),
       alcoholContent,
       type: drinkType,
@@ -187,12 +199,12 @@ const AddDrink = () => {
                       label="Amount"
                       type="number"
                       value={ingredient.amount}
-                      onChange={(e) => handleIngredientChange(index, 'amount', parseFloat(e.target.value) || 1)}
+                      onChange={(e) => handleIngredientChange(index, 'amount', e.target.value)}
                       required
                       sx={{ flex: 1 }}
                       disabled={ingredient.unit === Unit.TOP_UP}
                       error={ingredientErrors[index]?.amount}
-                      helperText={ingredient.unit === Unit.TOP_UP ? '' : ingredientErrors[index]?.amount ? 'Must be > 0' : ''}
+                      helperText={ingredient.unit === Unit.TOP_UP ? '' : ingredientErrors[index]?.amount ? 'Must be at least 1' : ''}
                       inputProps={{ min: 1 }}
                     />
                     <TextField
