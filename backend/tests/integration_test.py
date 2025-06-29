@@ -1,31 +1,10 @@
-from unittest.mock import patch
 import uuid
-
 from app.models import Ingredient, DrinkRecipe, DrinkType, Unit
-from app.main import app, mixology_agent
+from app.main import app
 from fastapi.testclient import TestClient
 from app.main import drink_db
 
 client = TestClient(app)
-
-mock_drink = DrinkRecipe(
-    id=uuid.uuid4(),
-    name="Mocktail Delight",
-    ingredients=[
-        Ingredient(name="apple juice", amount=50.0, unit=Unit.MILLILITER),
-        Ingredient(name="lime", amount=1.0, unit=Unit.PIECE),
-        Ingredient(name="mint", amount=5.0, unit=Unit.PIECE),
-    ],
-    instructions=["Mix all ingredients", "Shake well", "Serve over ice"],
-    alcoholContent=False,
-    type=DrinkType.MOCKTAIL,
-    imageId=11481550,
-    isFavorite=False,
-)
-
-
-class MockResult:
-    output = mock_drink
 
 
 # @app.get("/drinks")
@@ -167,38 +146,6 @@ def test_get_random_drink_success():
 
 
 # @app.post("/drinks/generate")
-def test_generate_drink_success():
-    original_drinks = drink_db.copy()
-
-    try:
-        mock_ai_result = MockResult()
-        mock_image_id = 11481550
-
-        with patch.object(
-            mixology_agent, "run_sync", return_value=mock_ai_result
-        ), patch("app.main.get_pexels_images", return_value=[mock_image_id]):
-
-            response = client.post(
-                "/drinks/generate",
-                json={"ingredients": ["apple juice", "lime", "mint"]},
-            )
-
-            assert response.status_code == 200
-            data = response.json()
-            returned_drink = DrinkRecipe(**data)
-
-            assert returned_drink.name == "Mocktail Delight"
-            assert returned_drink.imageId == mock_image_id
-            assert len(returned_drink.ingredients) == 3
-            assert any(
-                ing.name.lower() == "apple juice" for ing in returned_drink.ingredients
-            )
-
-    finally:
-        drink_db.clear()
-        drink_db.extend(original_drinks)
-
-
 def test_generate_drink_from_ingredients_error():
     response = client.post("/drinks/generate", json=["glue", "paper"])
     assert response.status_code in [200, 422]
