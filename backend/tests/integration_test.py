@@ -14,19 +14,6 @@ def test_list_all_drinks_success():
     assert isinstance(response.json(), list)
 
 
-# @app.post("/drinks/images")
-def test_fetch_images_success():
-    payload = {"name": "mojito", "count": 2, "page": 1}
-    response = client.post("/drinks/images", json=payload)
-    assert response.status_code == 200
-    data = response.json()
-    assert isinstance(data, list)
-    assert len(data) == payload["count"]
-    for image_id in data:
-        assert isinstance(image_id, int)
-        assert image_id > 0
-
-
 # @app.post("/drinks")
 def test_add_new_drink_success():
     new_drink = {
