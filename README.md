@@ -2,7 +2,7 @@
 
 A playful, responsive app for discovering drink recipes based on your available ingredients. Instantly generate **cocktails, mocktails, smoothies, and more** with a creative AI twist.
 
-[**Live Demo**](xxxxx) 
+[**Live Demo**](https://youtu.be/lMML5YUiLf4?si=Aqv6K9yvF7MjEYl1) 
 
 ## 🖼️ App Preview
 
