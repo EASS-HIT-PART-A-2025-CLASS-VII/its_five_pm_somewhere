@@ -22,7 +22,7 @@ import {
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import styled from 'styled-components';
-import { DrinkRecipe, DrinkType, Ingredient, Unit } from '../client';
+import { DrinkRecipe, DrinkType, Unit } from '../client';
 import { useDrinkContext } from '../contexts/DrinkContext';
 import ImageSelectModal from '../components/ImageSelectModal';
 import { Lightbox } from '../components/Lightbox';
