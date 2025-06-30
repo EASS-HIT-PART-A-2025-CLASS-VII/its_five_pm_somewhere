@@ -6,9 +6,13 @@ A playful, responsive app for discovering drink recipes based on your available 
 
 ## 🖼️ App Preview
 
-![image](https://github.com/user-attachments/assets/1427aa15-6b4d-4f60-bf58-1e794acc2905)
-![image](https://github.com/user-attachments/assets/e7b614b0-9278-4020-9bd7-9634deb319ca)
-![image](https://github.com/user-attachments/assets/50b874b4-b5a9-4b6f-88c4-bbe875786ab7)
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/1427aa15-6b4d-4f60-bf58-1e794acc2905" width="200"/>
+  <img src="https://github.com/user-attachments/assets/e7b614b0-9278-4020-9bd7-9634deb319ca" width="200"/>
+  <img src="https://github.com/user-attachments/assets/50b874b4-b5a9-4b6f-88c4-bbe875786ab7" width="200"/>
+  <img src="https://github.com/user-attachments/assets/e4046125-17a9-4b29-b3da-0f25857417d1" width="200"/>
+</p>
+
 
 
 ## 🏗️ Architecture
@@ -70,8 +74,8 @@ A playful, responsive app for discovering drink recipes based on your available 
 4. **Access the app:**
 
    - Frontend: **[http://localhost:5173](http://localhost:5173)**
-   - Backend: **[http://localhost:8000](http://localhost:8000)**
-   - Pexels Service: **[http://localhost:9000](http://localhost:9000)**
+   - Backend: **[http://localhost:8000/docs](http://localhost:8000/docs)**
+   - Pexels Service: **[http://localhost:9000/docs](http://localhost:9000/docs)**
 
 ## 🧪 Testing
 
