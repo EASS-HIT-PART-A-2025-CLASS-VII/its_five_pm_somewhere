@@ -4,6 +4,8 @@ A playful, responsive app for discovering drink recipes based on your available 
 
 [**Live Demo**](https://youtu.be/lMML5YUiLf4?si=Aqv6K9yvF7MjEYl1) 
 
+---
+
 ## 🖼️ App Preview
 
 <p align="center">
@@ -13,7 +15,7 @@ A playful, responsive app for discovering drink recipes based on your available 
   <img src="https://github.com/user-attachments/assets/e4046125-17a9-4b29-b3da-0f25857417d1" width="200"/>
 </p>
 
-
+---
 
 ## 🏗️ Architecture
 
@@ -22,6 +24,8 @@ A playful, responsive app for discovering drink recipes based on your available 
 - **Frontend** (React app): User interacts with the UI, which sends requests to the backend.
 - **Backend** (FastAPI): Handles recipe logic, AI-powered drink generation, and manages favorites. Communicates with the Pexels service for images.
 - **Pexels Service** (FastAPI microservice): Fetches relevant drink images from the Pexels API.
+
+---
 
 ## ✨ Features
 
@@ -32,6 +36,8 @@ A playful, responsive app for discovering drink recipes based on your available 
 - **Image Integration:** Each recipe includes a relevant image from Pexels.
 - **Modern UI:** Responsive, accessible, and easy to use.
 
+---
+
 ## 🛠️ Tech Stack
 
 - **Frontend:** Vite, React, TypeScript, MUI, styled-components, React Context API
@@ -40,33 +46,45 @@ A playful, responsive app for discovering drink recipes based on your available 
 - **Images:** Pexels API via dedicated microservice
 - **Infrastructure:** Docker & Docker Compose for full-stack orchestration
 
+---
+
 ## 🚀 Getting Started
+
+Sure! Here’s a clearer version that explicitly points back to the **Prerequisites** section so it’s easier to follow:
 
 ### Prerequisites
 
-- [Docker](https://www.docker.com/) and Docker Compose installed
-- API keys for [Groq](https://console.groq.com/keys) and [Pexels](https://www.pexels.com/api/key/)
+* [Docker](https://www.docker.com/) and Docker Compose installed
+* API keys:
+
+  * [Groq](https://console.groq.com/keys) → needed for `GROQ_API_KEY`
+  * [Pexels](https://www.pexels.com/api/key/) → needed for `PEXELS_API_KEY`
 
 ### Setup
 
 1. **Clone the repository:**
+
    ```bash
    git clone https://github.com/EASS-HIT-PART-A-2025-CLASS-VII/its_five_pm_somewhere.git
    cd its_five_pm_somewhere
    ```
 
 2. **Prepare environment variables:**
+   Use the API keys you got from the **Prerequisites** section:
 
-   - `backend/.env`:
+   * `backend/.env`:
+
      ```
      GROQ_API_KEY=your_groq_api_key
      ```
-   - `pexels_service/.env`:
+   * `pexels_service/.env`:
+
      ```
      PEXELS_API_KEY=your_pexels_api_key
      ```
 
 3. **Build and run the app:**
+
    ```bash
    docker-compose up --build
    ```
@@ -77,9 +95,13 @@ A playful, responsive app for discovering drink recipes based on your available 
    - Backend: **[http://localhost:8000/docs](http://localhost:8000/docs)**
    - Pexels Service: **[http://localhost:9000/docs](http://localhost:9000/docs)**
 
+---
+
 ## 🧪 Testing
 
 - **Automated integration tests** run automatically when the Docker stack is started.
+
+---
 
 ## 📁 Code Structure
 
@@ -91,6 +113,8 @@ A playful, responsive app for discovering drink recipes based on your available 
 | `docker-compose.yml` | Orchestrates the full stack                   |
 
 Certainly! Below is a well-structured "Advanced Code" section for your README, highlighting the key architectural and engineering decisions reflected in your codebase. This section is tailored to your implementation and includes the points you requested, plus additional best practices observed in your code.
+
+---
 
 ## Advanced Code
 
@@ -125,5 +149,6 @@ This project demonstrates several advanced engineering practices to ensure perfo
 - **Environment-Based Configuration:**  
   Sensitive credentials and configuration values are managed via environment variables and `.env` files, keeping secrets out of the codebase and supporting multiple deployment environments.
 
+---
 
 Enjoy mixing and discovering new drinks! 🍸
