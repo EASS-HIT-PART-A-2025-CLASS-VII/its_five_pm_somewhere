@@ -29,9 +29,8 @@ from pydantic_ai.providers.groq import GroqProvider
 load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 
-PEXELS_SERVICE_URL = os.getenv(
-    "PEXELS_SERVICE_URL", "http://pexels_service:9000/images"
-)
+PEXELS_SERVICE_URL = os.getenv("PEXELS_SERVICE_URL")
+
 
 # --- FastAPI App Initialization ---
 app = FastAPI()
@@ -114,7 +113,7 @@ def list_all_ingredients_info():
 
 @app.post("/drinks/images", response_model=List[int])
 def fetch_drink_images(request: ImageSearchRequest):
-    response = httpx.post(PEXELS_SERVICE_URL, json=request.dict())
+    response = httpx.post(PEXELS_SERVICE_URL + "/images", json=request.dict())
     if response.status_code != 200:
         raise HTTPException(
             status_code=response.status_code,
@@ -161,7 +160,9 @@ async def generate_drink_from_ingredients(request: IngredientsRequest):
 
     imgRequest = ImageSearchRequest(name=new_drink.name, count=1, page=1)
     async with httpx.AsyncClient() as client:
-        imgResponse = await client.post(PEXELS_SERVICE_URL, json=imgRequest.dict())
+        imgResponse = await client.post(
+            PEXELS_SERVICE_URL + "/images", json=imgRequest.dict()
+        )
         if imgResponse.status_code != 200:
             new_drink.imageId = None
         else:
